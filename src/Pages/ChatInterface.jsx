@@ -127,7 +127,7 @@ export default function ChatInterface() {
     setLoadingMessages(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/operator/conversations/${chatData.conversationId}/messages`,
+        `https://operator-api-production-de23.up.railway.app/operator/conversations/${chatData.conversationId}/messages`,
       );
       const data = await res.json();
       setMessages(data || []);
@@ -142,7 +142,7 @@ export default function ChatInterface() {
     setLoadingPhotos(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/operator/private-photos/${chatData.fictionalProfile.id}?conversation_id=${chatData.conversationId}`,
+        `https://operator-api-production-de23.up.railway.app/operator/private-photos/${chatData.fictionalProfile.id}?conversation_id=${chatData.conversationId}`,
       );
       const data = await res.json();
       setPrivatePhotos(data || []);
@@ -156,7 +156,7 @@ export default function ChatInterface() {
   const fetchUserLogbook = async () => {
     try {
       const res = await fetch(
-        `http://localhost:4000/operator/user-logbook/${chatData.userProfile.id}`,
+        `https://operator-api-production-de23.up.railway.app/operator/user-logbook/${chatData.userProfile.id}`,
       );
       const data = await res.json();
       setUserLogbook(data || {});
@@ -168,7 +168,7 @@ export default function ChatInterface() {
   const fetchFictionalLogbook = async () => {
     try {
       const res = await fetch(
-        `http://localhost:4000/operator/fictional-logbook/${chatData.fictionalProfile.id}`,
+        `https://operator-api-production-de23.up.railway.app/operator/fictional-logbook/${chatData.fictionalProfile.id}`,
       );
       const data = await res.json();
       setFictionalLogbook(data || {});
@@ -233,8 +233,8 @@ export default function ChatInterface() {
         });
 
         const sendEndpoint = isStopped
-          ? "http://localhost:4000/stopped/send-message"
-          : "http://localhost:4000/operator/send-reply";
+          ? "https://operator-api-production-de23.up.railway.app/stopped/send-message"
+          : "https://operator-api-production-de23.up.railway.app/operator/send-reply";
 
         const textRes = await fetch(sendEndpoint, {
           method: "POST",
@@ -259,7 +259,7 @@ export default function ChatInterface() {
       // Then, send each selected photo
       for (const photo of selectedPhotos) {
         const photoRes = await fetch(
-          "http://localhost:4000/operator/send-photo",
+          "https://operator-api-production-de23.up.railway.app/operator/send-photo",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -317,16 +317,19 @@ export default function ChatInterface() {
     if (!noteCategory) return;
 
     try {
-      const res = await fetch("http://localhost:4000/operator/user-logbook", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_profile_id: chatData.userProfile.id,
-          category: noteCategory,
-          value: noteValue,
-          operator_id: operator.id,
-        }),
-      });
+      const res = await fetch(
+        "https://operator-api-production-de23.up.railway.app/operator/user-logbook",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_profile_id: chatData.userProfile.id,
+            category: noteCategory,
+            value: noteValue,
+            operator_id: operator.id,
+          }),
+        },
+      );
 
       if (res.ok) {
         fetchUserLogbook();
@@ -348,7 +351,7 @@ export default function ChatInterface() {
 
     try {
       const res = await fetch(
-        "http://localhost:4000/operator/fictional-logbook",
+        "https://operator-api-production-de23.up.railway.app/operator/fictional-logbook",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -384,14 +387,17 @@ export default function ChatInterface() {
     ) {
       try {
         // Release the current message back to the queue
-        await fetch("http://localhost:4000/operator/release-message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            queue_id: chatData.queueId,
-            operator_id: operator.id,
-          }),
-        });
+        await fetch(
+          "https://operator-api-production-de23.up.railway.app/operator/release-message",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              queue_id: chatData.queueId,
+              operator_id: operator.id,
+            }),
+          },
+        );
         navigate("/dashboard");
       } catch (err) {
         console.error("Stop chatting error:", err);
@@ -404,14 +410,17 @@ export default function ChatInterface() {
     if (chatData?.queueId) {
       // Release the message back to queue before logging out
       try {
-        await fetch("http://localhost:4000/operator/release-message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            queue_id: chatData.queueId,
-            operator_id: operator.id,
-          }),
-        });
+        await fetch(
+          "https://operator-api-production-de23.up.railway.app/operator/release-message",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              queue_id: chatData.queueId,
+              operator_id: operator.id,
+            }),
+          },
+        );
       } catch (err) {
         console.error("Release message on logout error:", err);
       }

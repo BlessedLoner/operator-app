@@ -43,7 +43,7 @@ export default function WaitingRoom() {
     const heartbeatInterval = setInterval(() => {
       const endpoint = isStopped ? "stopped/heartbeat" : "operator/heartbeat";
 
-      fetch(`http://localhost:4000/${endpoint}`, {
+      fetch(`https://operator-api-production-de23.up.railway.app/${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -77,7 +77,9 @@ export default function WaitingRoom() {
         ? `/stopped/next-conversation?operator_id=${operator.id}`
         : `/operator/current-message?operator_id=${operator.id}`;
 
-      const res = await fetch(`http://localhost:4000${endpoint}`);
+      const res = await fetch(
+        `https://operator-api-production-de23.up.railway.app${endpoint}`,
+      );
       const data = await res.json();
       console.log("📨 Response:", data);
 
@@ -108,14 +110,17 @@ export default function WaitingRoom() {
       let assignRes;
       if (isStopped) {
         assignRes = await fetch(
-          `http://localhost:4000/${assignEndpoint}?operator_id=${operator.id}`,
+          `https://operator-api-production-de23.up.railway.app/${assignEndpoint}?operator_id=${operator.id}`,
         );
       } else {
-        assignRes = await fetch(`http://localhost:4000/${assignEndpoint}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ operator_id: operator.id }),
-        });
+        assignRes = await fetch(
+          `https://operator-api-production-de23.up.railway.app/${assignEndpoint}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ operator_id: operator.id }),
+          },
+        );
       }
 
       const assignData = await assignRes.json();

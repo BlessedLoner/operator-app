@@ -72,7 +72,7 @@ export default function Dashboard() {
       const endpoint = isStopped ? "stopped" : "operator";
 
       const res = await fetch(
-        `http://localhost:4000/${endpoint}/stats?operator_id=${operatorId}&operator_name=${operatorName}`,
+        `https://operator-api-production-de23.up.railway.app/${endpoint}/stats?operator_id=${operatorId}&operator_name=${operatorName}`,
       );
       const data = await res.json();
       if (res.ok) {
@@ -98,11 +98,14 @@ export default function Dashboard() {
           ? "stopped/next-conversation"
           : "operator/assign-next";
 
-        const res = await fetch(`http://localhost:4000/${endpoint}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ operator_id: operator.id }),
-        });
+        const res = await fetch(
+          `https://operator-api-production-de23.up.railway.app/${endpoint}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ operator_id: operator.id }),
+          },
+        );
         const data = await res.json();
 
         if (data.assigned) {

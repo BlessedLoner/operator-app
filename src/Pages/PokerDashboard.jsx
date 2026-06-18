@@ -169,7 +169,10 @@ export default function PokerDashboard() {
           [JSON.stringify({ queue_id: queueId, operator_id: operator?.id })],
           { type: "application/json" },
         );
-        navigator.sendBeacon("http://localhost:4000/poker/release-user", blob);
+        navigator.sendBeacon(
+          "https://operator-api-production-de23.up.railway.app/poker/release-user",
+          blob,
+        );
       }
     };
 
@@ -192,7 +195,7 @@ export default function PokerDashboard() {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/poker/next-user?operator_id=${operator.id}`,
+        `https://operator-api-production-de23.up.railway.app/poker/next-user?operator_id=${operator.id}`,
       );
       console.log("📡 Response status:", res.status);
 
@@ -236,17 +239,20 @@ export default function PokerDashboard() {
     try {
       // Send text message if any
       if (flirtMessage.trim()) {
-        const res = await fetch("http://localhost:4000/poker/send-flirt", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            queue_id: queueId,
-            user_profile_id: assignedUser.id,
-            fictional_profile_id: suggestedFictional.id,
-            content: flirtMessage,
-            operator_id: operator.id,
-          }),
-        });
+        const res = await fetch(
+          "https://operator-api-production-de23.up.railway.app/poker/send-flirt",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              queue_id: queueId,
+              user_profile_id: assignedUser.id,
+              fictional_profile_id: suggestedFictional.id,
+              content: flirtMessage,
+              operator_id: operator.id,
+            }),
+          },
+        );
 
         if (!res.ok) {
           const error = await res.json();
@@ -257,7 +263,7 @@ export default function PokerDashboard() {
       // Send selected photos
       for (const photo of selectedPhotos) {
         const photoRes = await fetch(
-          "http://localhost:4000/operator/send-photo",
+          "https://operator-api-production-de23.up.railway.app/operator/send-photo",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -299,14 +305,17 @@ export default function PokerDashboard() {
     if (queueId) {
       try {
         console.log("🔄 Releasing assigned user back to queue...");
-        await fetch("http://localhost:4000/poker/release-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            queue_id: queueId,
-            operator_id: operator.id,
-          }),
-        });
+        await fetch(
+          "https://operator-api-production-de23.up.railway.app/poker/release-user",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              queue_id: queueId,
+              operator_id: operator.id,
+            }),
+          },
+        );
         console.log("✅ User released successfully");
       } catch (err) {
         console.error("Error releasing user:", err);

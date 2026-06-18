@@ -17,7 +17,7 @@ export default function Conversation() {
   ------------------------------- */
   useEffect(() => {
     fetch(
-      `http://localhost:4000/operator/conversations/${conversationId}/messages`,
+      `https://operator-api-production-de23.up.railway.app/operator/conversations/${conversationId}/messages`,
     )
       .then((res) => res.json())
       .then(setMessages);
@@ -67,14 +67,17 @@ export default function Conversation() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const res = await fetch("http://localhost:4000/operator/reply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        conversation_id: conversationId,
-        content: input,
-      }),
-    });
+    const res = await fetch(
+      "https://operator-api-production-de23.up.railway.app/operator/reply",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: conversationId,
+          content: input,
+        }),
+      },
+    );
 
     if (!res.ok) {
       const text = await res.text();

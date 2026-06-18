@@ -58,7 +58,7 @@ export default function StoppedDashboard() {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/stopped/next-conversation?operator_id=${operator.id}`,
+        `https://operator-api-production-de23.up.railway.app/stopped/next-conversation?operator_id=${operator.id}`,
       );
       console.log("📡 Response status:", res.status);
 
@@ -94,17 +94,20 @@ export default function StoppedDashboard() {
     setIsSending(true);
 
     try {
-      const res = await fetch("http://localhost:4000/stopped/send-message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          queue_id: queueId,
-          conversation_id: assignedConversation.conversationId,
-          fictional_profile_id: assignedConversation.fictional.id,
-          content: message,
-          operator_id: operator.id,
-        }),
-      });
+      const res = await fetch(
+        "https://operator-api-production-de23.up.railway.app/stopped/send-message",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            queue_id: queueId,
+            conversation_id: assignedConversation.conversationId,
+            fictional_profile_id: assignedConversation.fictional.id,
+            content: message,
+            operator_id: operator.id,
+          }),
+        },
+      );
 
       console.log("📡 Send message response status:", res.status);
       const data = await res.json();
