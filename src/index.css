@@ -1,0 +1,128 @@
+/* Tailwind CSS v4 import */
+@import "tailwindcss";
+
+/* Font imports */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400&display=swap");
+
+/* Base styles - keep but don't conflict with Tailwind */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove conflicting body styles - Tailwind handles centering */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Playfair Display", serif;
+}
+
+/* Link styles */
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+/* Button base styles */
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Custom component classes */
+.btn-primary {
+  border-radius: 0.5rem;
+  background-color: rgb(212 165 116);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  font-weight: 600;
+  color: rgb(255 255 255);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.12);
+}
+
+.btn-primary:hover {
+  transform: translateY(-0.125rem);
+  background-color: rgb(193 150 96);
+  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.16);
+}
+
+.card {
+  border-radius: 0.75rem;
+  background-color: rgb(247 243 240);
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(44, 24, 16, 0.08);
+}
+
+.form-input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: rgb(212 165 116 / 0.2);
+  background-color: rgb(254 252 250);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.form-input:focus {
+  border-color: rgb(212 165 116);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  --tw-ring-color: rgb(212 165 116 / 0.3);
+}
+
+/* Utility classes (in case Tailwind doesn't have them) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.emoji {
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.flag-emoji {
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
