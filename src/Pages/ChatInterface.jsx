@@ -247,6 +247,7 @@ export default function ChatInterface() {
             operator_id: operator.id,
             image_url:
               selectedPhotos.length > 0 ? selectedPhotos[0].image_url : null, // ✅ Send image URL
+            device_id: localStorage.getItem("operator_device_id"),
           }),
         });
 
