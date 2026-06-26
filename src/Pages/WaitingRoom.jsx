@@ -48,6 +48,7 @@ export default function WaitingRoom() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           operator_id: operator.id,
+          device_id: localStorage.getItem("operator_device_id"),
         }),
       }).catch((err) => {
         console.error("Heartbeat failed:", err);
@@ -118,7 +119,10 @@ export default function WaitingRoom() {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ operator_id: operator.id }),
+            body: JSON.stringify({
+              operator_id: operator.id,
+              device_id: localStorage.getItem("operator_device_id"),
+            }),
           },
         );
       }
