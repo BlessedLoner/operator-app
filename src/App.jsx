@@ -75,6 +75,11 @@ export default function App() {
     localStorage.setItem("operator_device_id", crypto.randomUUID());
   }
 
+  console.log(
+    "Operator Device ID:",
+    localStorage.getItem("operator_device_id"),
+  );
+
   return (
     <BrowserRouter
       future={{
