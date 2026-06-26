@@ -70,6 +70,11 @@ function DashboardRouter() {
 }
 
 export default function App() {
+  // Generate persistent device ID
+  if (!localStorage.getItem("operator_device_id")) {
+    localStorage.setItem("operator_device_id", crypto.randomUUID());
+  }
+
   return (
     <BrowserRouter
       future={{
