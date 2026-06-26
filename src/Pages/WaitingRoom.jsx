@@ -74,9 +74,13 @@ export default function WaitingRoom() {
 
     try {
       // Use different endpoint based on operator type
+      // const endpoint = isStopped
+      //   ? `/stopped/next-conversation?operator_id=${operator.id}`
+      //   : `/operator/current-message?operator_id=${operator.id}`;
+
       const endpoint = isStopped
         ? `/stopped/next-conversation?operator_id=${operator.id}`
-        : `/operator/current-message?operator_id=${operator.id}`;
+        : `/operator/current-message?operator_id=${operator.id}&device_id=${localStorage.getItem("operator_device_id")}`;
 
       const res = await fetch(
         `https://operator-api-production-de23.up.railway.app${endpoint}`,
