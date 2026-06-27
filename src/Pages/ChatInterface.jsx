@@ -586,7 +586,7 @@ export default function ChatInterface() {
                     />
                     <div>
                       <h2 className="text-lg font-bold text-black">
-                        {fictional?.display_name}
+                        {fictional?.display_name}, ({fictional?.name || "N/A"})
                       </h2>
                       <p className="text-black text-xs">
                         {fictional?.city || "Unknown"}, {fictional?.state || ""}
