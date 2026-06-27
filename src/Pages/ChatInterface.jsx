@@ -253,6 +253,19 @@ export default function ChatInterface() {
 
         if (!textRes.ok) {
           const errorData = await textRes.json();
+
+          // Duplicate device protection
+          if (textRes.status === 409) {
+            alert(
+              "This conversation is already being handled on another device/tab for this operator account.",
+            );
+
+            // Immediately leave chat
+            navigate("/dashboard");
+
+            return;
+          }
+
           throw new Error(errorData.error || "Failed to send message");
         }
       }
