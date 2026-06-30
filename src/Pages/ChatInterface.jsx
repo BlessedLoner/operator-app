@@ -65,29 +65,36 @@ export default function ChatInterface() {
     fetchFictionalLogbook();
 
     const expiresAt = new Date(chatData.expiresAt);
+
     const updateRemainingTime = () => {
       const now = new Date();
+
       const remaining = Math.max(0, Math.floor((expiresAt - now) / 1000));
+
       setRemainingTime(remaining);
 
       if (remaining <= 0) {
         clearInterval(timerRef.current);
+
         alert("Message timeout. Returning to dashboard...");
+
         navigate("/dashboard");
       }
     };
 
     updateRemainingTime();
+
     timerRef.current = setInterval(updateRemainingTime, 1000);
 
     updateUserLocalTime();
+
     const timeInterval = setInterval(updateUserLocalTime, 1000);
 
     return () => {
       clearInterval(timerRef.current);
       clearInterval(timeInterval);
     };
-  }, [chatData, navigate]);
+  }, [chatData]);
 
   useEffect(() => {
     if (!chatData?.conversationId) return;
@@ -531,6 +538,26 @@ export default function ChatInterface() {
     return text.substring(0, maxLength) + "...";
   };
 
+  function maskSensitiveInfo(text) {
+    if (!text) return text;
+
+    let masked = text;
+
+    // Mask emails
+    masked = masked.replace(
+      /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
+      (email) => {
+        const domain = email.split("@")[1];
+        return `***********@${domain}`;
+      },
+    );
+
+    // Mask phone numbers
+    masked = masked.replace(/(\+?\d[\d\s\-]{6,}\d)/g, "***********");
+
+    return masked;
+  }
+
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
       {/* Top Bar */}
@@ -936,10 +963,10 @@ export default function ChatInterface() {
                                 />
                               )}
                               {/* Text below image */}
-                              {msg.content && (
+                              {maskSensitiveInfo(msg.content) && (
                                 <div className="px-4 py-2">
                                   <p className="text-sm break-words">
-                                    {msg.content}
+                                    {maskSensitiveInfo(msg.content)}
                                   </p>
                                   <p
                                     className={`text-xs mt-1 ${isUser ? "text-black" : "text-gray-500"}`}
