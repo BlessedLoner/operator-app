@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [operator, setOperator] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false); // NEW: Loading state for accept button
   const navigate = useNavigate();
 
   // ✅ Auto-logout after 30 minutes of inactivity
@@ -89,6 +90,7 @@ export default function Dashboard() {
 
   // Proceed to chat after accepting terms
   const proceedToChat = async () => {
+    setIsAccepting(true); // Set loading to true
     try {
       const operator = JSON.parse(localStorage.getItem("operator"));
 
@@ -107,6 +109,9 @@ export default function Dashboard() {
       );
       const data = await res.json();
 
+      // Close modal before navigating
+      setShowTermsModal(false);
+
       if (data.assigned) {
         navigate("/chat", {
           state: {
@@ -124,7 +129,10 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error("Error assigning message:", err);
+      setShowTermsModal(false);
       navigate("/waiting-room");
+    } finally {
+      setIsAccepting(false); // Set loading to false
     }
   };
 
@@ -135,14 +143,12 @@ export default function Dashboard() {
 
   // Handle accept terms
   const handleAcceptTerms = () => {
-    setShowTermsModal(false);
     proceedToChat();
   };
 
   // Handle decline terms
   const handleDeclineTerms = () => {
     setShowTermsModal(false);
-    // Optionally: show a message or just close modal
   };
 
   const handleLogout = () => {
@@ -188,7 +194,8 @@ export default function Dashboard() {
               </div>
               <button
                 onClick={handleDeclineTerms}
-                className="text-gray-400 hover:text-gray-600 transition"
+                disabled={isAccepting}
+                className="text-gray-400 hover:text-gray-600 transition disabled:opacity-50"
               >
                 <svg
                   className="w-6 h-6"
@@ -384,16 +391,46 @@ export default function Dashboard() {
             <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 justify-end bg-gray-50 rounded-b-2xl">
               <button
                 onClick={handleDeclineTerms}
-                className="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition"
+                disabled={isAccepting}
+                className="px-6 py-2.5 text-sm font-medium bg-red-500 text-gray-600 hover:text-gray-800 hover:bg-red-300 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Decline
               </button>
               <button
                 onClick={handleAcceptTerms}
-                className="px-8 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                disabled={isAccepting}
+                className="px-8 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 min-w-[180px] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <span>✅</span>
-                Accept & Continue
+                {isAccepting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>✅</span>
+                    Accept & Continue
+                  </>
+                )}
               </button>
             </div>
           </div>
