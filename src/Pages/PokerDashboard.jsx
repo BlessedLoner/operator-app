@@ -227,6 +227,8 @@ export default function PokerDashboard() {
     }
   };
 
+  // In PokerDashboard.jsx - Updated handleSendFlirt
+
   const handleSendFlirt = async () => {
     if (!flirtMessage.trim() && selectedPhotos.length === 0) {
       alert("Please enter a message or select a photo");
@@ -237,7 +239,9 @@ export default function PokerDashboard() {
     setIsSending(true);
 
     try {
-      // Send text message if any
+      // First, send the flirt message and get the conversation ID
+      let conversationId = null;
+
       if (flirtMessage.trim()) {
         const res = await fetch(
           "https://operator-api-production-de23.up.railway.app/poker/send-flirt",
@@ -258,9 +262,13 @@ export default function PokerDashboard() {
           const error = await res.json();
           throw new Error(error.error || "Failed to send");
         }
+
+        const data = await res.json();
+        conversationId = data.conversationId;
+        console.log("✅ Flirt sent, conversation ID:", conversationId);
       }
 
-      // Send selected photos
+      // Send selected photos AFTER the message (with the correct conversation ID)
       for (const photo of selectedPhotos) {
         const photoRes = await fetch(
           "https://operator-api-production-de23.up.railway.app/operator/send-photo",
@@ -269,7 +277,7 @@ export default function PokerDashboard() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               photo_id: photo.id,
-              conversation_id: queueId,
+              conversation_id: conversationId, // ✅ Use the actual conversation ID
               fictional_profile_id: suggestedFictional.id,
               operator_id: operator.id,
             }),
@@ -288,6 +296,8 @@ export default function PokerDashboard() {
       setWaiting(true);
       fetchPokerStats(operator.id);
 
+      // Reset interval and start checking for next user
+      if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = setInterval(() => {
         checkForNextUser();
         setWaitingTime((prev) => prev + 5);
