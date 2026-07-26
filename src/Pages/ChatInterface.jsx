@@ -867,7 +867,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>👤 Name:</strong>{" "}
-                            {fictionalLogbook.name_given.value}
+                            {fictionalLogbook.name_given}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -881,8 +881,7 @@ export default function ChatInterface() {
                       {fictionalLogbook.city && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>📍City:</strong>{" "}
-                            {fictionalLogbook.city.value}
+                            <strong>📍City:</strong> {fictionalLogbook.city}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -896,8 +895,7 @@ export default function ChatInterface() {
                       {fictionalLogbook.age && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>🎂 Age:</strong>{" "}
-                            {fictionalLogbook.age.value}
+                            <strong>🎂 Age:</strong> {fictionalLogbook.age}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -909,8 +907,7 @@ export default function ChatInterface() {
                       {fictionalLogbook.job && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>💼 Job:</strong>{" "}
-                            {fictionalLogbook.job.value}
+                            <strong>💼 Job:</strong> {fictionalLogbook.job}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -923,7 +920,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>📖 Backstory:</strong>{" "}
-                            {fictionalLogbook.backstory.value}
+                            {fictionalLogbook.backstory}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -937,8 +934,7 @@ export default function ChatInterface() {
                       {fictionalLogbook.notes && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>Notes:</strong>{" "}
-                            {fictionalLogbook.notes.value}
+                            <strong>Notes:</strong> {fictionalLogbook.notes}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -953,7 +949,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>🧠 Personality:</strong>{" "}
-                            {fictionalLogbook.personality.value}
+                            {fictionalLogbook.personality}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -968,7 +964,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong> ❤️ Preferences:</strong>{" "}
-                            {fictionalLogbook.preferences.value}
+                            {fictionalLogbook.preferences}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -983,7 +979,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>📝 Personal Information:</strong>{" "}
-                            {fictionalLogbook.personal_information.value}
+                            {fictionalLogbook.personal_information}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
