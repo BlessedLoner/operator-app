@@ -74,7 +74,7 @@ export default function Login() {
                   placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-100 border border-blue-500/50 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 border border-blue-500/50 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all duration-200"
                   required
                 />
               </div>
@@ -105,7 +105,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-100 border border-blue-500/50 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 border border-blue-500/50 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all duration-200"
                   required
                 />
               </div>
