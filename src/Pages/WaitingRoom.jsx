@@ -169,21 +169,32 @@ export default function WaitingRoom() {
           {/* Spinner Animation */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-20 h-20 border-4 border-gray-600 rounded-full animate-spin border-t-primary"></div>
+              {/* Multi-color Spinner */}
+              <div className="w-24 h-24">
+                <div className="absolute inset-0 rounded-full border-[6px] border-gray-200"></div>
+                <div className="absolute inset-0 rounded-full border-[6px] border-transparent border-t-primary border-r-secondary border-b-accent border-l-transparent animate-spin"></div>
+
+                {/* Pulsing ring */}
+                <div className="absolute -inset-1 rounded-full border-2 border-primary/20 animate-ping"></div>
+              </div>
+
+              {/* Center Icon */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
+                <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-primary animate-pulse"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
