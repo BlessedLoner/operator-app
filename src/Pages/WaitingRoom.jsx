@@ -163,9 +163,9 @@ export default function WaitingRoom() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="text-center">
-        <div className="bg-black backdrop-blur-lg rounded-2xl p-8 md:p-12 max-w-md w-full">
+        <div className="bg-gray-100 rounded-2xl p-8 md:p-12 max-w-md w-full">
           {/* Spinner Animation */}
           <div className="flex justify-center mb-6">
             <div className="relative">
@@ -188,22 +188,22 @@ export default function WaitingRoom() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-2xl font-bold text-black mb-2">
             Waiting for a new message
           </h2>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="text-gray-600 text-sm mb-6">
             Stay on this page. A message will appear automatically.
           </p>
 
-          <div className="bg-white/5 rounded-xl p-4 mb-6">
-            <p className="text-gray-300 text-sm">Waiting time</p>
+          <div className="bg-gray-200 rounded-xl p-4 mb-6">
+            <p className="text-gray-800 text-sm">Waiting time</p>
             <p className="text-3xl font-mono font-bold text-primary">
               {formatTime(waitingTime)}
             </p>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-2 mb-6">
-            <p className="text-gray-200 text-xs">Last checked: {lastChecked}</p>
+          <div className="bg-gray-200 rounded-xl p-2 mb-6">
+            <p className="text-gray-800 text-xs">Last checked: {lastChecked}</p>
           </div>
 
           <button
@@ -213,7 +213,7 @@ export default function WaitingRoom() {
             Back to Dashboard
           </button>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-gray-600 mt-4">
             Operator: {operator.username}
           </p>
         </div>
