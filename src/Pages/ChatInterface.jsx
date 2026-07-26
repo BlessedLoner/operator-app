@@ -53,6 +53,8 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
+  console.log(chatData);
+
   useEffect(() => {
     if (!chatData) {
       navigate("/dashboard");
@@ -159,12 +161,14 @@ export default function ChatInterface() {
       setLoadingPhotos(false);
     }
   };
-
   const fetchUserLogbook = async () => {
+    if (!chatData?.conversation?.id) return;
+
     try {
       const res = await fetch(
-        `https://operator-api-production-de23.up.railway.app/operator/user-logbook/${chatData.userProfile.id}`,
+        `https://operator-api-production-de23.up.railway.app/operator/user-logbook/${chatData.conversation.id}`,
       );
+
       const data = await res.json();
       setUserLogbook(data || {});
     } catch (err) {
@@ -173,10 +177,13 @@ export default function ChatInterface() {
   };
 
   const fetchFictionalLogbook = async () => {
+    if (!chatData?.conversation?.id) return;
+
     try {
       const res = await fetch(
-        `https://operator-api-production-de23.up.railway.app/operator/fictional-logbook/${chatData.fictionalProfile.id}`,
+        `https://operator-api-production-de23.up.railway.app/operator/fictional-logbook/${chatData.conversation.id}`,
       );
+
       const data = await res.json();
       setFictionalLogbook(data || {});
     } catch (err) {
@@ -344,6 +351,7 @@ export default function ChatInterface() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            conversation_id: chatData.conversation.id,
             user_profile_id: chatData.userProfile.id,
             category: noteCategory,
             value: noteValue,
@@ -377,6 +385,7 @@ export default function ChatInterface() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            conversation_id: chatData.conversation.id,
             fictional_profile_id: chatData.fictionalProfile.id,
             category: noteCategory,
             value: noteValue,
