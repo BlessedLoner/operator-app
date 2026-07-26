@@ -490,6 +490,7 @@ export default function ChatInterface() {
     { value: "notes", label: "General Notes" },
     { value: "sexual_preference", label: "Sexual Preference" },
     { value: "personal_information", label: "Personal Information" },
+    { value: "photo", label: "Photo" },
   ];
 
   const fictionalNoteCategories = [
@@ -502,6 +503,7 @@ export default function ChatInterface() {
     { value: "age", label: "Age" },
     { value: "job", label: "Job" },
     { value: "personal_information", label: "Personal Information" },
+    { value: "photo", label: "Photo" },
   ];
 
   const formatLogbookTime = (date) => {
@@ -991,6 +993,21 @@ export default function ChatInterface() {
                             Updated{" "}
                             {formatLogbookTime(
                               fictionalLogbook.personal_information.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.photo && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong> 📷 Photo:</strong>{" "}
+                            {fictionalLogbook.photo.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.photo.updated_at,
                             )}
                           </p>
                         </div>
@@ -1608,43 +1625,147 @@ export default function ChatInterface() {
                   </button>
 
                   {/* User Logbook Display */}
-                  {/* <div className="mt-3 p-2 bg-gray-50 rounded-lg">
+                  <div className="mt-3 p-2 bg-gray-50 rounded-lg">
                     <p className="text-xs text-gray-500 mb-1">
                       New member note
                     </p>
                     {Object.keys(userLogbook).length > 0 ? (
                       <>
                         {userLogbook.name && (
-                          <p className="text-xs text-gray-700">
-                            <strong>Name:</strong> {userLogbook.name}
-                          </p>
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>👤 Name:</strong> {userLogbook.name.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.name.created_at)}
+                            </p>
+                          </div>
                         )}
                         {userLogbook.contact && (
-                          <p className="text-xs text-gray-700">
-                            <strong>Contact:</strong> {userLogbook.contact}
-                          </p>
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong> Contact:</strong>{" "}
+                              {userLogbook.contact.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(
+                                userLogbook.contact.created_at,
+                              )}
+                            </p>
+                          </div>
                         )}
                         {userLogbook.city && (
-                          <p className="text-xs text-gray-700">
-                            <strong>City:</strong> {userLogbook.city}
-                          </p>
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>📍City:</strong> {userLogbook.city.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.city.created_at)}
+                            </p>
+                          </div>
                         )}
                         {userLogbook.notes && (
-                          <p className="text-xs text-gray-700">
-                            <strong>Notes:</strong> {userLogbook.notes}
-                          </p>
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>� Notes:</strong>{" "}
+                              {userLogbook.notes.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.notes.created_at)}
+                            </p>
+                          </div>
+                        )}
+                        {userLogbook.job && (
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>💼 Job:</strong> {userLogbook.job.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.job.created_at)}
+                            </p>
+                          </div>
+                        )}
+                        {userLogbook.age && (
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>🎂 Age:</strong> {userLogbook.age.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.age.created_at)}
+                            </p>
+                          </div>
+                        )}
+                        {userLogbook.personal_information && (
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>📝 Personal Information:</strong>{" "}
+                              {userLogbook.personal_information.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(
+                                userLogbook.personal_information.created_at,
+                              )}
+                            </p>
+                          </div>
+                        )}
+                        {userLogbook.sexual_preference && (
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>❤️ Sexual Preference:</strong>{" "}
+                              {userLogbook.sexual_preference.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(
+                                userLogbook.sexual_preference.created_at,
+                              )}
+                            </p>
+                          </div>
+                        )}
+                        {userLogbook.photo && (
+                          <div className="mb-2">
+                            <p className="text-xs text-gray-700">
+                              <strong>📷 Photo:</strong>{" "}
+                              {userLogbook.photo.value}
+                            </p>
+
+                            <p className="text-[10px] text-gray-400">
+                              Added{" "}
+                              {formatLogbookTime(userLogbook.photo.created_at)}
+                            </p>
+                          </div>
                         )}
                         {!userLogbook.name &&
                           !userLogbook.contact &&
                           !userLogbook.city &&
-                          !userLogbook.notes && (
+                          !userLogbook.notes &&
+                          !userLogbook.age &&
+                          !userLogbook.job &&
+                          !userLogbook.photo &&
+                          !userLogbook.sexual_preference &&
+                          !userLogbook.personal_information && (
                             <p className="text-xs text-gray-400">No notes</p>
                           )}
                       </>
                     ) : (
                       <p className="text-xs text-gray-400">No notes</p>
                     )}
-                  </div> */}
+                  </div>
                 </div>
               </div>
             </div>
