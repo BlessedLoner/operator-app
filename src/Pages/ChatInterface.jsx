@@ -183,6 +183,7 @@ export default function ChatInterface() {
       );
 
       const data = await res.json();
+      console.log("Fictional Logbook API:", data);
       setFictionalLogbook(data || {});
     } catch (err) {
       console.error("Failed to fetch fictional logbook:", err);
@@ -867,7 +868,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>👤 Name:</strong>{" "}
-                            {fictionalLogbook.name_given}
+                            {fictionalLogbook.name_given.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -881,7 +882,8 @@ export default function ChatInterface() {
                       {fictionalLogbook.city && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>📍City:</strong> {fictionalLogbook.city}
+                            <strong>📍City:</strong>{" "}
+                            {fictionalLogbook.city.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -895,7 +897,8 @@ export default function ChatInterface() {
                       {fictionalLogbook.age && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>🎂 Age:</strong> {fictionalLogbook.age}
+                            <strong>🎂 Age:</strong>{" "}
+                            {fictionalLogbook.age.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -907,7 +910,8 @@ export default function ChatInterface() {
                       {fictionalLogbook.job && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>💼 Job:</strong> {fictionalLogbook.job}
+                            <strong>💼 Job:</strong>{" "}
+                            {fictionalLogbook.job.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -920,7 +924,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>📖 Backstory:</strong>{" "}
-                            {fictionalLogbook.backstory}
+                            {fictionalLogbook.backstory.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -934,7 +938,8 @@ export default function ChatInterface() {
                       {fictionalLogbook.notes && (
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
-                            <strong>Notes:</strong> {fictionalLogbook.notes}
+                            <strong>Notes:</strong>{" "}
+                            {fictionalLogbook.notes.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -949,7 +954,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>🧠 Personality:</strong>{" "}
-                            {fictionalLogbook.personality}
+                            {fictionalLogbook.personality.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -964,7 +969,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong> ❤️ Preferences:</strong>{" "}
-                            {fictionalLogbook.preferences}
+                            {fictionalLogbook.preferences.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
@@ -979,7 +984,7 @@ export default function ChatInterface() {
                         <div className="mb-2">
                           <p className="text-xs text-gray-700">
                             <strong>📝 Personal Information:</strong>{" "}
-                            {fictionalLogbook.personal_information}
+                            {fictionalLogbook.personal_information.value}
                           </p>
 
                           <p className="text-[10px] text-gray-400">
