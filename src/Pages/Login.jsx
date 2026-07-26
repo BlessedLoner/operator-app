@@ -40,17 +40,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Operator Login</h2>
-          <p className="text-gray-400 text-sm">Access the operator dashboard</p>
+          <h2 className="text-3xl font-bold text-black mb-2">Operator Login</h2>
+          <p className="text-gray-700 text-sm">Access the operator dashboard</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
                 Username
               </label>
               <div className="relative">
@@ -74,14 +74,14 @@ export default function Login() {
                   placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-white border border-white/20 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
                 Password
               </label>
               <div className="relative">
@@ -105,7 +105,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-white border border-white/20 rounded-xl text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                   required
                 />
               </div>

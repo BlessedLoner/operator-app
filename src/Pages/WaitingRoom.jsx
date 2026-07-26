@@ -163,9 +163,9 @@ export default function WaitingRoom() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="text-center">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 md:p-12 max-w-md w-full">
+        <div className="bg-black backdrop-blur-lg rounded-2xl p-8 md:p-12 max-w-md w-full">
           {/* Spinner Animation */}
           <div className="flex justify-center mb-6">
             <div className="relative">
@@ -203,7 +203,7 @@ export default function WaitingRoom() {
           </div>
 
           <div className="bg-white/5 rounded-xl p-2 mb-6">
-            <p className="text-gray-400 text-xs">Last checked: {lastChecked}</p>
+            <p className="text-gray-200 text-xs">Last checked: {lastChecked}</p>
           </div>
 
           <button
