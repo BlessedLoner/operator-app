@@ -47,7 +47,7 @@ export default function Login() {
           <p className="text-gray-700 text-sm">Access the operator dashboard</p>
         </div>
 
-        <div className="">
+        <div className="bg-gray-100 rounded-1xl p-8 border border-white/20">
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
