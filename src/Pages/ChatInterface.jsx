@@ -1608,7 +1608,7 @@ export default function ChatInterface() {
                   </button>
 
                   {/* User Logbook Display */}
-                  <div className="mt-3 p-2 bg-gray-50 rounded-lg">
+                  {/* <div className="mt-3 p-2 bg-gray-50 rounded-lg">
                     <p className="text-xs text-gray-500 mb-1">
                       New member note
                     </p>
@@ -1644,7 +1644,7 @@ export default function ChatInterface() {
                     ) : (
                       <p className="text-xs text-gray-400">No notes</p>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
