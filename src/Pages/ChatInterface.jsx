@@ -847,486 +847,167 @@ export default function ChatInterface() {
                   </div>
 
                   {/* Fictional Logbook Button */}
-                  {/* Fictional Profile Information */}
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                        <span>📋</span> Profile Information
-                      </h4>
-                      <button
-                        onClick={() => {
-                          setNoteType("fictional");
-                          setShowFictionalNoteModal(true);
-                        }}
-                        className="px-3 py-1.5 text-xs bg-primary text-white rounded-lg hover:opacity-90 transition"
-                      >
-                        + Add Note
-                      </button>
-                    </div>
+                  <button
+                    onClick={() => {
+                      setNoteType("fictional");
+                      setShowFictionalNoteModal(true);
+                    }}
+                    className="w-full mt-4 px-3 py-2 text-xs bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-200 transition"
+                  >
+                    📝 Personal information
+                  </button>
 
-                    {/* Profile Info Cards */}
-                    {Object.keys(fictionalLogbook).length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {/* Name Given */}
-                        {fictionalLogbook.name_given && (
-                          <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  👤 Name
-                                </p>
-                                <p className="text-sm font-medium text-gray-800 truncate">
-                                  {fictionalLogbook.name_given.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.name_given.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "name_given",
-                                    value: fictionalLogbook.name_given.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                  {/* Fictional Logbook Display */}
+                  {Object.keys(fictionalLogbook).length > 0 && (
+                    <div className="mt-3 p-2 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-gray-500 mb-1">
+                        New profile note
+                      </p>
+                      {fictionalLogbook.name_given && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>👤 Name:</strong>{" "}
+                            {fictionalLogbook.name_given.value}
+                          </p>
 
-                        {/* City */}
-                        {fictionalLogbook.city && (
-                          <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  📍 City
-                                </p>
-                                <p className="text-sm font-medium text-gray-800 truncate">
-                                  {fictionalLogbook.city.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.city.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "city",
-                                    value: fictionalLogbook.city.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Age */}
-                        {fictionalLogbook.age && (
-                          <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  🎂 Age
-                                </p>
-                                <p className="text-sm font-medium text-gray-800 truncate">
-                                  {fictionalLogbook.age.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.age.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "age",
-                                    value: fictionalLogbook.age.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Job */}
-                        {fictionalLogbook.job && (
-                          <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  💼 Job
-                                </p>
-                                <p className="text-sm font-medium text-gray-800 truncate">
-                                  {fictionalLogbook.job.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.job.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "job",
-                                    value: fictionalLogbook.job.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Backstory (Full width) */}
-                        {fictionalLogbook.backstory && (
-                          <div className="col-span-1 sm:col-span-2 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  📖 Backstory
-                                </p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
-                                  {fictionalLogbook.backstory.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.backstory.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "backstory",
-                                    value: fictionalLogbook.backstory.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2 flex-shrink-0"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Personality (Full width) */}
-                        {fictionalLogbook.personality && (
-                          <div className="col-span-1 sm:col-span-2 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  🧠 Personality
-                                </p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
-                                  {fictionalLogbook.personality.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.personality.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "personality",
-                                    value: fictionalLogbook.personality.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2 flex-shrink-0"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Preferences (Full width) */}
-                        {fictionalLogbook.preferences && (
-                          <div className="col-span-1 sm:col-span-2 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  ❤️ Preferences
-                                </p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
-                                  {fictionalLogbook.preferences.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.preferences.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "preferences",
-                                    value: fictionalLogbook.preferences.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2 flex-shrink-0"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Personal Information (Full width) */}
-                        {fictionalLogbook.personal_information && (
-                          <div className="col-span-1 sm:col-span-2 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  📝 Personal Information
-                                </p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
-                                  {fictionalLogbook.personal_information.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.personal_information
-                                      .created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "personal_information",
-                                    value:
-                                      fictionalLogbook.personal_information
-                                        .value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2 flex-shrink-0"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* General Notes (Full width) */}
-                        {fictionalLogbook.notes && (
-                          <div className="col-span-1 sm:col-span-2 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
-                                  📋 General Notes
-                                </p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
-                                  {fictionalLogbook.notes.value}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">
-                                  Added{" "}
-                                  {formatLogbookTime(
-                                    fictionalLogbook.notes.created_at,
-                                  )}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setNoteType("fictional");
-                                  setEditingNote({
-                                    category: "notes",
-                                    value: fictionalLogbook.notes.value,
-                                  });
-                                  setShowFictionalNoteModal(true);
-                                }}
-                                className="text-gray-400 hover:text-primary transition ml-2 flex-shrink-0"
-                              >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Empty State */}
-                        {!fictionalLogbook.name_given &&
-                          !fictionalLogbook.backstory &&
-                          !fictionalLogbook.personality &&
-                          !fictionalLogbook.preferences &&
-                          !fictionalLogbook.notes &&
-                          !fictionalLogbook.city &&
-                          !fictionalLogbook.age &&
-                          !fictionalLogbook.job &&
-                          !fictionalLogbook.personal_information && (
-                            <div className="col-span-2 text-center py-6">
-                              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                                <span className="text-2xl">📝</span>
-                              </div>
-                              <p className="text-sm text-gray-500">
-                                No profile notes yet
-                              </p>
-                              <p className="text-xs text-gray-400 mt-1">
-                                Click "Add Note"
-                              </p>
-                            </div>
-                          )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                          <span className="text-2xl">📝</span>
+                          <p className="text-[10px] text-gray-400">
+                            Added{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.name_given.created_at,
+                            )}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-500">
-                          No profile notes yet
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                      {fictionalLogbook.city && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>📍City:</strong>{" "}
+                            {fictionalLogbook.city.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.city.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.age && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>🎂 Age:</strong>{" "}
+                            {fictionalLogbook.age.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(fictionalLogbook.age.updated_at)}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.job && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>💼 Job:</strong>{" "}
+                            {fictionalLogbook.job.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(fictionalLogbook.job.updated_at)}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.backstory && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>📖 Backstory:</strong>{" "}
+                            {fictionalLogbook.backstory.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.backstory.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.notes && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>Notes:</strong>{" "}
+                            {fictionalLogbook.notes.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.notes.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.personality && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>🧠 Personality:</strong>{" "}
+                            {fictionalLogbook.personality.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.personality.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.preferences && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong> ❤️ Preferences:</strong>{" "}
+                            {fictionalLogbook.preferences.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.preferences.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+                      {fictionalLogbook.personal_information && (
+                        <div className="mb-2">
+                          <p className="text-xs text-gray-700">
+                            <strong>📝 Personal Information:</strong>{" "}
+                            {fictionalLogbook.personal_information.value}
+                          </p>
+
+                          <p className="text-[10px] text-gray-400">
+                            Updated{" "}
+                            {formatLogbookTime(
+                              fictionalLogbook.personal_information.updated_at,
+                            )}
+                          </p>
+                        </div>
+                      )}
+
+                      {!fictionalLogbook.name_given &&
+                        !fictionalLogbook.backstory &&
+                        !fictionalLogbook.personality &&
+                        !fictionalLogbook.preferences &&
+                        !fictionalLogbook.personal_information &&
+                        !fictionalLogbook.notes &&
+                        !fictionalLogbook.city &&
+                        !fictionalLogbook.age &&
+                        !fictionalLogbook.job && (
+                          <p className="text-xs text-gray-400">No notes</p>
+                        )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
