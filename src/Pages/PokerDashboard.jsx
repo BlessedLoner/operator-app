@@ -381,13 +381,13 @@ export default function PokerDashboard() {
 
   if (waiting && !assignedUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-white/70">
+          <h2 className="text-xl font-semibold text-gray-800">
             Waiting for new users...
           </h2>
-          <p className="text-gray-400 mt-2">
+          <p className="text-gray-600 mt-2">
             Time waiting: {Math.floor(waitingTime / 60)}:
             {(waitingTime % 60).toString().padStart(2, "0")}
           </p>
@@ -396,7 +396,7 @@ export default function PokerDashboard() {
           </p>
           <button
             onClick={handleLogout}
-            className="mt-6 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            className="mt-6 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
           >
             Logout
           </button>
