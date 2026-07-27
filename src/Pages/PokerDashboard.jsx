@@ -487,7 +487,7 @@ export default function PokerDashboard() {
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-4">
                   <h2 className="text-xl font-bold text-white">
-                    Send Flirt Message
+                    Send Flirt Engaging Message
                   </h2>
                 </div>
                 <div className="p-6">
