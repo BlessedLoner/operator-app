@@ -523,40 +523,75 @@ export default function PokerDashboard() {
                         </div>
                       )}
                     </div>
-                    <div className="bg-pink-100 rounded-lg p-3">
-                      <p className="text-xs text-pink-600 mb-2">
-                        Suggested Matches
-                      </p>
+                    <div className="text-right">
+                      {/* Current selected profile */}
+                      {suggestedFictional && (
+                        <div className="bg-pink-100 rounded-lg p-3 mb-3">
+                          <p className="text-xs text-pink-600 mb-1">
+                            Messaging as:
+                          </p>
 
-                      <div className="space-y-2">
-                        {suggestedProfiles.map((profile) => (
-                          <button
-                            key={profile.id}
-                            onClick={() => setSuggestedFictional(profile)}
-                            className={`w-full flex items-center gap-2 p-2 rounded-lg border transition ${
-                              suggestedFictional?.id === profile.id
-                                ? "border-pink-500 bg-pink-50"
-                                : "border-gray-200 bg-white hover:bg-gray-50"
-                            }`}
-                          >
+                          <div className="flex items-center gap-2">
                             <img
-                              src={profile.image_url || "/default-avatar.png"}
-                              className="w-10 h-10 rounded-full object-cover"
+                              src={
+                                suggestedFictional.image_url ||
+                                "/default-avatar.png"
+                              }
+                              className="w-8 h-8 rounded-full object-cover"
                               alt=""
+                              onError={(e) => {
+                                e.target.src = "/default-avatar.png";
+                              }}
                             />
 
-                            <div className="text-left flex-1">
-                              <div className="font-semibold text-sm">
-                                {profile.display_name}
-                              </div>
+                            <span className="font-semibold text-pink-700">
+                              {suggestedFictional.display_name}
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
-                              <div className="text-xs text-gray-500">
-                                {profile.age} • {profile.city}
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
+                      {/* Suggested matches */}
+                      {suggestedProfiles.length > 0 && (
+                        <div className="bg-white border rounded-lg p-3">
+                          <p className="text-xs font-semibold text-gray-500 mb-2">
+                            Suggested Matches
+                          </p>
+
+                          <div className="space-y-2">
+                            {suggestedProfiles.map((profile) => (
+                              <button
+                                key={profile.id}
+                                type="button"
+                                onClick={() => setSuggestedFictional(profile)}
+                                className={`w-full flex items-center gap-2 p-2 rounded-lg transition ${
+                                  suggestedFictional?.id === profile.id
+                                    ? "bg-pink-100 border border-pink-400"
+                                    : "hover:bg-gray-100 border"
+                                }`}
+                              >
+                                <img
+                                  src={
+                                    profile.image_url || "/default-avatar.png"
+                                  }
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  alt=""
+                                />
+
+                                <div className="text-left">
+                                  <div className="font-medium">
+                                    {profile.display_name}
+                                  </div>
+
+                                  <div className="text-xs text-gray-500">
+                                    {profile.age} • {profile.city}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {/* {suggestedFictional && (
                       <div className="text-right">
