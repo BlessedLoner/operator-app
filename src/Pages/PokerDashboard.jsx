@@ -7,6 +7,7 @@ export default function PokerDashboard() {
   const [operator, setOperator] = useState(null);
   const [assignedUser, setAssignedUser] = useState(null);
   const [suggestedFictional, setSuggestedFictional] = useState(null);
+  const [suggestedProfiles, setSuggestedProfiles] = useState([]);
   const [queueId, setQueueId] = useState(null);
   const [flirtMessage, setFlirtMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -207,6 +208,7 @@ export default function PokerDashboard() {
         setWaiting(false);
         setAssignedUser(data.user);
         setSuggestedFictional(data.suggestedFictional);
+        setSuggestedProfiles(data.suggestedProfiles || []);
         setQueueId(data.queueId);
         setError(null);
 
@@ -521,7 +523,42 @@ export default function PokerDashboard() {
                         </div>
                       )}
                     </div>
-                    {suggestedFictional && (
+                    <div className="bg-pink-100 rounded-lg p-3">
+                      <p className="text-xs text-pink-600 mb-2">
+                        Suggested Matches
+                      </p>
+
+                      <div className="space-y-2">
+                        {suggestedProfiles.map((profile) => (
+                          <button
+                            key={profile.id}
+                            onClick={() => setSuggestedFictional(profile)}
+                            className={`w-full flex items-center gap-2 p-2 rounded-lg border transition ${
+                              suggestedFictional?.id === profile.id
+                                ? "border-pink-500 bg-pink-50"
+                                : "border-gray-200 bg-white hover:bg-gray-50"
+                            }`}
+                          >
+                            <img
+                              src={profile.image_url || "/default-avatar.png"}
+                              className="w-10 h-10 rounded-full object-cover"
+                              alt=""
+                            />
+
+                            <div className="text-left flex-1">
+                              <div className="font-semibold text-sm">
+                                {profile.display_name}
+                              </div>
+
+                              <div className="text-xs text-gray-500">
+                                {profile.age} • {profile.city}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {/* {suggestedFictional && (
                       <div className="text-right">
                         <div className="bg-pink-100 rounded-lg p-3">
                           <p className="text-xs text-pink-600 mb-1">
@@ -545,7 +582,7 @@ export default function PokerDashboard() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Message Input */}
