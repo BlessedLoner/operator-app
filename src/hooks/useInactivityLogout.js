@@ -7,6 +7,7 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
   const navigate = useNavigate();
   const inactivityTimerRef = useRef(null);
   const INACTIVITY_TIMEOUT = INACTIVITY_MINUTES * 60 * 1000;
+  const isLoggingOut = useRef(false);
 
   // Check if operator account is still active
   const checkIfActive = async (retryCount = 0) => {
@@ -22,9 +23,23 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
         .eq("id", operator.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // ✅ If it's a network error, don't log out - just retry
+        if (error.code === "PGRST301" || error.message?.includes("network")) {
+          console.warn("⚠️ Network error checking account status, will retry");
+          if (retryCount < 3) {
+            setTimeout(() => checkIfActive(retryCount + 1), 5000);
+          }
+          return;
+        }
+        throw error;
+      }
 
-      if (!data?.is_active) {
+      if (data?.is_active === false) {
+        console.log("🔴 Account deactivated, logging out...");
+        if (isLoggingOut.current) return;
+        isLoggingOut.current = true;
+
         alert("Your account has been deactivated. Please contact support.");
         localStorage.removeItem("operator");
         navigate("/");
@@ -32,8 +47,8 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
     } catch (err) {
       console.error("Error checking account status:", err);
 
-      // ✅ Retry after 5 seconds if failed (max 3 retries)
-      if (retryCount < 3) {
+      // ✅ Only retry on network errors, not on actual errors
+      if (retryCount < 3 && err.code !== "PGRST116") {
         console.log(`Retrying... (${retryCount + 1}/3)`);
         setTimeout(() => checkIfActive(retryCount + 1), 5000);
       }
@@ -48,6 +63,9 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
 
     inactivityTimerRef.current = setTimeout(() => {
       console.log("⏰ Inactivity timeout - logging out");
+      if (isLoggingOut.current) return;
+      isLoggingOut.current = true;
+
       alert(
         `You have been logged out due to ${INACTIVITY_MINUTES} minutes of inactivity.`,
       );
@@ -65,13 +83,15 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
     const operatorData = localStorage.getItem("operator");
     if (!operatorData) return;
 
+    isLoggingOut.current = false;
+
     // Start inactivity timer
     resetInactivityTimer();
 
-    // Check account status every 30 seconds
+    // Check account status every 60 seconds (instead of 30)
     const statusCheckInterval = setInterval(() => {
       checkIfActive();
-    }, 30000);
+    }, 60000);
 
     // Track user activity events
     const events = [

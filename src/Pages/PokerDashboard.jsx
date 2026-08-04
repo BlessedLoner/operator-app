@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import { useInactivityLogout } from "../hooks/useInactivityLogout";
 
 export default function PokerDashboard() {
   const [operator, setOperator] = useState(null);
@@ -28,6 +29,9 @@ export default function PokerDashboard() {
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
   const intervalRef = useRef(null);
   const navigate = useNavigate();
+
+  // ✅ Auto-logout after 30 minutes of inactivity
+  useInactivityLogout(30);
 
   // Fetch poker statistics
   const fetchPokerStats = async (operatorId) => {

@@ -1,3 +1,4 @@
+// src/pages/WaitingRoom.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInactivityLogout } from "../hooks/useInactivityLogout";
@@ -5,6 +6,7 @@ import { useInactivityLogout } from "../hooks/useInactivityLogout";
 export default function WaitingRoom() {
   const [waitingTime, setWaitingTime] = useState(0);
   const [lastChecked, setLastChecked] = useState("Waiting...");
+  const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
 
   // ✅ Auto-logout after 30 minutes of inactivity
@@ -12,9 +14,7 @@ export default function WaitingRoom() {
 
   const intervalRef = useRef(null);
   const startTimeRef = useRef(Date.now());
-
-  // const operator = JSON.parse(localStorage.getItem("operator") || "{}");
-  // const isStopped = operator?.operator_type === "stopped";
+  const isNavigatingRef = useRef(false);
 
   const operatorRef = useRef(
     JSON.parse(localStorage.getItem("operator") || "{}"),
@@ -62,21 +62,15 @@ export default function WaitingRoom() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("WaitingRoom mounted");
-  }, []);
-
   const checkForNextItem = async () => {
     if (!operator) return;
+    if (isNavigatingRef.current) return;
+    if (isConnecting) return;
 
     setLastChecked(new Date().toLocaleTimeString());
-    console.log("🔍 Checking for next item...");
 
     try {
-      // Use different endpoint based on operator type
-      // const endpoint = isStopped
-      //   ? `/stopped/next-conversation?operator_id=${operator.id}`
-      //   : `/operator/current-message?operator_id=${operator.id}`;
+      setIsConnecting(true);
 
       const endpoint = isStopped
         ? `/stopped/next-conversation?operator_id=${operator.id}`
@@ -85,12 +79,23 @@ export default function WaitingRoom() {
       const res = await fetch(
         `https://operator-api-production-de23.up.railway.app${endpoint}`,
       );
+
+      if (!res.ok) {
+        // ✅ Don't navigate on 404 or 500 errors, just log and wait
+        if (res.status === 404 || res.status === 500) {
+          console.log(`⚠️ Server error (${res.status}), waiting...`);
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+
       const data = await res.json();
-      console.log("📨 Response:", data);
 
       if (data.hasConversation || data.hasMessage) {
         console.log("✅ Item found! Navigating to chat...");
         if (intervalRef.current) clearInterval(intervalRef.current);
+        isNavigatingRef.current = true;
+
         navigate("/chat", {
           state: {
             queueId: data.queueId,
@@ -106,7 +111,6 @@ export default function WaitingRoom() {
       }
 
       // If no assigned item, try to assign a new one
-      console.log("🔄 No assigned item. Trying to assign a new one...");
       const assignEndpoint = isStopped
         ? "stopped/next-conversation"
         : "operator/assign-next";
@@ -131,12 +135,20 @@ export default function WaitingRoom() {
         );
       }
 
+      if (!assignRes.ok) {
+        console.log(
+          `⚠️ Assign request failed (${assignRes.status}), waiting...`,
+        );
+        return;
+      }
+
       const assignData = await assignRes.json();
-      console.log("📦 Assign response:", assignData);
 
       if (assignData.assigned || assignData.hasConversation) {
         console.log("✅ New item assigned! Navigating to chat...");
         if (intervalRef.current) clearInterval(intervalRef.current);
+        isNavigatingRef.current = true;
+
         navigate("/chat", {
           state: {
             queueId: assignData.queueId,
@@ -148,11 +160,12 @@ export default function WaitingRoom() {
             type: operator?.operator_type,
           },
         });
-      } else {
-        console.log("⏳ No items available. Waiting...");
       }
     } catch (err) {
+      // ✅ Don't navigate on errors, just log and wait
       console.error("Error checking for next item:", err);
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -165,20 +178,15 @@ export default function WaitingRoom() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="text-center">
-        <div className="bg-gray-100 rounded-2xl p-8 md:p-12 max-w-md w-full">
+        <div className="bg-white rounded-2xl p-8 md:p-12 max-w-md w-full shadow-lg">
           {/* Spinner Animation */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              {/* Multi-color Spinner */}
               <div className="w-24 h-24">
                 <div className="absolute inset-0 rounded-full border-[6px] border-gray-200"></div>
                 <div className="absolute inset-0 rounded-full border-[6px] border-transparent border-t-primary border-r-secondary border-b-accent border-l-transparent animate-spin"></div>
-
-                {/* Pulsing ring */}
                 <div className="absolute -inset-1 rounded-full border-2 border-primary/20 animate-ping"></div>
               </div>
-
-              {/* Center Icon */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
                   <svg
@@ -206,15 +214,20 @@ export default function WaitingRoom() {
             Stay on this page. A message will appear automatically.
           </p>
 
-          <div className="bg-gray-200 rounded-xl p-4 mb-6">
-            <p className="text-gray-800 text-sm">Waiting time</p>
+          <div className="bg-gray-100 rounded-xl p-4 mb-6">
+            <p className="text-gray-600 text-sm">Waiting time</p>
             <p className="text-3xl font-mono font-bold text-primary">
               {formatTime(waitingTime)}
             </p>
           </div>
 
-          <div className="bg-gray-200 rounded-xl p-2 mb-6">
-            <p className="text-gray-800 text-xs">Last checked: {lastChecked}</p>
+          <div className="bg-gray-100 rounded-xl p-2 mb-6">
+            <p className="text-gray-500 text-xs">
+              Last checked: {lastChecked}
+              {isConnecting && (
+                <span className="ml-2 text-primary">• Checking...</span>
+              )}
+            </p>
           </div>
 
           <button
@@ -224,8 +237,8 @@ export default function WaitingRoom() {
             Back to Dashboard
           </button>
 
-          <p className="text-xs text-gray-600 mt-4">
-            Operator: {operator.username}
+          <p className="text-xs text-gray-400 mt-4">
+            Operator: {operator?.username}
           </p>
         </div>
       </div>
