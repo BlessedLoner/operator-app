@@ -9,6 +9,8 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
   const INACTIVITY_TIMEOUT = INACTIVITY_MINUTES * 60 * 1000;
   const isLoggingOut = useRef(false);
 
+  const LAST_ACTIVITY_KEY = "operator_last_activity";
+
   // Check if operator account is still active
   const checkIfActive = async (retryCount = 0) => {
     const operatorData = localStorage.getItem("operator");
@@ -40,9 +42,7 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
         if (isLoggingOut.current) return;
         isLoggingOut.current = true;
 
-        alert("Your account has been deactivated. Please contact support.");
-        localStorage.removeItem("operator");
-        navigate("/");
+        logout("Your account has been deactivated. Please contact support.");
       }
     } catch (err) {
       console.error("Error checking account status:", err);
@@ -63,20 +63,45 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
 
     inactivityTimerRef.current = setTimeout(() => {
       console.log("⏰ Inactivity timeout - logging out");
-      if (isLoggingOut.current) return;
-      isLoggingOut.current = true;
 
-      alert(
+      logout(
         `You have been logged out due to ${INACTIVITY_MINUTES} minutes of inactivity.`,
       );
-      localStorage.removeItem("operator");
-      navigate("/");
     }, INACTIVITY_TIMEOUT);
   };
 
   // Track user activity
   const handleUserActivity = () => {
+    localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+
     resetInactivityTimer();
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState !== "visible") return;
+
+    const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY));
+
+    if (!lastActivity) return;
+
+    const elapsed = Date.now() - lastActivity;
+
+    if (elapsed >= INACTIVITY_TIMEOUT) {
+      logout(`You were inactive for more than ${INACTIVITY_MINUTES} minutes.`);
+    }
+  };
+
+  const logout = (message) => {
+    if (isLoggingOut.current) return;
+
+    isLoggingOut.current = true;
+
+    alert(message);
+
+    localStorage.removeItem("operator");
+    localStorage.removeItem(LAST_ACTIVITY_KEY);
+
+    navigate("/", { replace: true });
   };
 
   useEffect(() => {
@@ -84,6 +109,21 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
     if (!operatorData) return;
 
     isLoggingOut.current = false;
+
+    const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY));
+
+    if (!lastActivity) {
+      localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+    } else {
+      const elapsed = Date.now() - lastActivity;
+
+      if (elapsed >= INACTIVITY_TIMEOUT) {
+        logout(
+          `You were inactive for more than ${INACTIVITY_MINUTES} minutes.`,
+        );
+        return;
+      }
+    }
 
     // Start inactivity timer
     resetInactivityTimer();
@@ -106,6 +146,8 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
       window.addEventListener(event, handleUserActivity);
     });
 
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
@@ -114,6 +156,8 @@ export function useInactivityLogout(INACTIVITY_MINUTES = 30) {
       events.forEach((event) => {
         window.removeEventListener(event, handleUserActivity);
       });
+
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 }
