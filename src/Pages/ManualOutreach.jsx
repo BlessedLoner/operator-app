@@ -23,6 +23,12 @@ export default function ManualOutreach() {
   const [searchingFictional, setSearchingFictional] = useState(false);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
 
+  // ✅ Private photos states
+  const [privatePhotos, setPrivatePhotos] = useState([]);
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(false);
+  const [showPhotoPicker, setShowPhotoPicker] = useState(false);
+
   // Message states
   const [message, setMessage] = useState("");
   const [sendEmail, setSendEmail] = useState(false);
@@ -53,7 +59,6 @@ export default function ManualOutreach() {
 
     const operatorObj = JSON.parse(operatorData);
 
-    // Check if operator is 'outreach' type
     if (operatorObj.operator_type !== "outreach") {
       alert("This feature is only available for Outreach operators.");
       navigate("/dashboard");
@@ -64,6 +69,17 @@ export default function ManualOutreach() {
     setLoading(false);
     fetchOutreachHistory(operatorObj.id);
   }, [navigate]);
+
+  // ✅ Fetch private photos when fictional profile is selected
+  useEffect(() => {
+    if (selectedFictional?.id) {
+      fetchPrivatePhotos(selectedFictional.id);
+    } else {
+      setPrivatePhotos([]);
+      setSelectedPhotos([]);
+      setShowPhotoPicker(false);
+    }
+  }, [selectedFictional]);
 
   // Auto-search when query changes (debounced)
   useEffect(() => {
@@ -77,6 +93,44 @@ export default function ManualOutreach() {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // ✅ Fetch private photos for fictional profile
+  const fetchPrivatePhotos = async (fictionalId) => {
+    if (!fictionalId) {
+      setPrivatePhotos([]);
+      setSelectedPhotos([]);
+      return;
+    }
+
+    setLoadingPhotos(true);
+    try {
+      const { data, error } = await supabase
+        .from("fictional_private_photos")
+        .select("*")
+        .eq("fictional_profile_id", fictionalId)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+      setPrivatePhotos(data || []);
+      setSelectedPhotos([]); // Reset selected photos when profile changes
+      setShowPhotoPicker(false);
+    } catch (err) {
+      console.error("Error fetching private photos:", err);
+    } finally {
+      setLoadingPhotos(false);
+    }
+  };
+
+  // ✅ Select/deselect photo
+  const handleSelectPhoto = (photo) => {
+    setSelectedPhotos((prev) => {
+      if (prev.some((p) => p.id === photo.id)) {
+        return prev.filter((p) => p.id !== photo.id);
+      } else {
+        return [...prev, photo];
+      }
+    });
+  };
 
   // Search users
   const searchUsers = async () => {
@@ -120,6 +174,7 @@ export default function ManualOutreach() {
     setSearchQuery("");
     setSelectedFictional(null);
     setMessage("");
+    setSelectedPhotos([]);
     setShowHistory(false);
 
     // Fetch suggested fictional profiles
@@ -141,7 +196,6 @@ export default function ManualOutreach() {
       setSuggestedProfiles(data.suggested_profiles || []);
       setSuggestedCriteria(data.matched_criteria || null);
 
-      // Auto-select first profile
       if (data.suggested_profiles && data.suggested_profiles.length > 0) {
         setSelectedFictional(data.suggested_profiles[0]);
       }
@@ -186,6 +240,8 @@ export default function ManualOutreach() {
     setSelectedFictional(profile);
     setFictionalSearchResults([]);
     setFictionalSearchQuery("");
+    setSelectedPhotos([]); // Reset selected photos when switching profiles
+    setShowPhotoPicker(false);
   };
 
   // Fetch outreach history
@@ -217,15 +273,17 @@ export default function ManualOutreach() {
 
   // Send manual flirt
   const handleSendFlirt = async () => {
-    if (!selectedUser || !selectedFictional || !message.trim()) {
-      showToast(
-        "Please select a user, select a fictional profile, and write a message",
-        "error",
-      );
+    if (!selectedUser || !selectedFictional) {
+      showToast("Please select a user and a fictional profile", "error");
       return;
     }
 
-    if (message.length < 20) {
+    if (!message.trim() && selectedPhotos.length === 0) {
+      showToast("Please write a message or select a photo", "error");
+      return;
+    }
+
+    if (message.trim() && message.length < 20) {
       showToast("Message must be at least 20 characters", "error");
       return;
     }
@@ -234,57 +292,86 @@ export default function ManualOutreach() {
   };
 
   const confirmSend = async () => {
-    setShowConfirmModal(false);
     setSending(true);
+    // Keep modal open - we'll show loading state inside it
 
     try {
-      const res = await fetch(
-        "https://operator-api-production-de23.up.railway.app/operator/send-manual-flirt",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-operator-id": operator.id,
+      // First, send the flirt message
+      let conversationId = null;
+
+      if (message.trim()) {
+        const res = await fetch(
+          "https://operator-api-production-de23.up.railway.app/operator/send-manual-flirt",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-operator-id": operator.id,
+            },
+            body: JSON.stringify({
+              user_id: selectedUser.id,
+              fictional_profile_id: selectedFictional.id,
+              content: message,
+              operator_id: operator.id,
+              send_email: sendEmail,
+            }),
           },
-          body: JSON.stringify({
-            user_id: selectedUser.id,
-            fictional_profile_id: selectedFictional.id,
-            content: message,
-            operator_id: operator.id,
-            send_email: sendEmail,
-          }),
-        },
-      );
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        if (res.status === 429) {
-          showToast(data.error || "Daily limit reached", "error");
-          return;
+        if (!res.ok) {
+          if (res.status === 429) {
+            showToast(data.error || "Daily limit reached", "error");
+            setSending(false);
+            setShowConfirmModal(false);
+            return;
+          }
+          throw new Error(data.error || "Failed to send");
         }
-        throw new Error(data.error || "Failed to send");
+
+        conversationId = data.conversationId;
+        setRemainingDaily(data.remaining_daily || 0);
       }
 
-      showToast(
-        `✅ Flirt message sent successfully! ${data.is_new_conversation ? "New conversation started." : "Continued existing conversation."}`,
-        "success",
-      );
+      // ✅ Send selected photos AFTER the message (with the correct conversation ID)
+      for (const photo of selectedPhotos) {
+        const photoRes = await fetch(
+          "https://operator-api-production-de23.up.railway.app/operator/send-photo",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-operator-id": operator.id,
+            },
+            body: JSON.stringify({
+              photo_id: photo.id,
+              conversation_id: conversationId,
+              fictional_profile_id: selectedFictional.id,
+              operator_id: operator.id,
+            }),
+          },
+        );
+
+        if (!photoRes.ok) {
+          console.error("Failed to send photo:", photo.id);
+        }
+      }
+
+      // Close modal and show success
+      setShowConfirmModal(false);
+      showToast(`✅ Flirt message sent successfully!`, "success");
 
       // Reset form
       setMessage("");
       setSendEmail(false);
-      setRemainingDaily(data.remaining_daily || 0);
+      setSelectedPhotos([]);
 
       // Refresh history
       fetchOutreachHistory(operator.id);
-
-      // Reset selection (optional)
-      // setSelectedUser(null);
-      // setSelectedFictional(null);
-      // setSuggestedProfiles([]);
     } catch (err) {
       console.error("Send error:", err);
+      setShowConfirmModal(false);
       showToast("Failed to send: " + err.message, "error");
     } finally {
       setSending(false);
@@ -492,6 +579,7 @@ export default function ManualOutreach() {
                     setSelectedUser(null);
                     setSuggestedProfiles([]);
                     setSelectedFictional(null);
+                    setSelectedPhotos([]);
                   }}
                   className="mt-3 text-xs text-gray-400 hover:text-red-500 transition"
                 >
@@ -679,6 +767,126 @@ export default function ManualOutreach() {
               </div>
             )}
 
+            {/* ✅ Private Photos Section */}
+            {selectedFictional && privatePhotos.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <button
+                  onClick={() => setShowPhotoPicker(!showPhotoPicker)}
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm font-medium mb-2 transition"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect
+                      x="2"
+                      y="4"
+                      width="20"
+                      height="18"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <circle
+                      cx="8.5"
+                      cy="9.5"
+                      r="2.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M21 15l-5-4-3 3-4-4-5 5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  {showPhotoPicker
+                    ? "Hide Private Photos"
+                    : "Show Private Photos"}
+                  <span className="text-xs text-gray-400">
+                    ({privatePhotos.length} available)
+                  </span>
+                </button>
+
+                {showPhotoPicker && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    {loadingPhotos ? (
+                      <div className="flex justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-4 gap-2">
+                        {privatePhotos.map((photo) => (
+                          <button
+                            key={photo.id}
+                            onClick={() => handleSelectPhoto(photo)}
+                            className={`relative rounded-lg overflow-hidden aspect-square transition-all ${
+                              selectedPhotos.some((p) => p.id === photo.id)
+                                ? "ring-4 ring-primary ring-offset-2"
+                                : "hover:ring-2 hover:ring-primary/30"
+                            }`}
+                          >
+                            <img
+                              src={photo.image_url}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                            {selectedPhotos.some((p) => p.id === photo.id) && (
+                              <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
+                                <svg
+                                  className="w-3 h-3 text-white"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ✅ Selected Photo Preview */}
+            {selectedPhotos.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-4 border border-primary/20">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-primary">
+                    Photos to send:
+                  </span>
+                  <button
+                    onClick={() => setSelectedPhotos([])}
+                    className="text-xs text-gray-400 hover:text-red-500 transition"
+                  >
+                    Remove all
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  {selectedPhotos.map((photo) => (
+                    <img
+                      key={photo.id}
+                      src={photo.image_url}
+                      className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                      alt=""
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Message Input */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
@@ -728,7 +936,8 @@ export default function ManualOutreach() {
                 disabled={
                   !selectedUser ||
                   !selectedFictional ||
-                  message.length < 20 ||
+                  (!message.trim() && selectedPhotos.length === 0) ||
+                  (message.trim() && message.length < 20) ||
                   sending
                 }
                 className="mt-4 w-full py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
@@ -752,10 +961,17 @@ export default function ManualOutreach() {
                 </p>
               )}
               {selectedFictional &&
-                message.length < 20 &&
-                message.length > 0 && (
+                message.length > 0 &&
+                message.length < 20 && (
                   <p className="mt-2 text-xs text-amber-600 text-center">
                     Please add at least {20 - message.length} more characters
+                  </p>
+                )}
+              {selectedFictional &&
+                !message.trim() &&
+                selectedPhotos.length === 0 && (
+                  <p className="mt-2 text-xs text-amber-600 text-center">
+                    Please write a message or select a photo
                   </p>
                 )}
             </div>
@@ -903,17 +1119,25 @@ export default function ManualOutreach() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* ✅ Updated Confirmation Modal with Loading State */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div className="text-center mb-4">
               <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-100 flex items-center justify-center">
-                <span className="text-3xl">✋</span>
+                {sending ? (
+                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+                ) : (
+                  <span className="text-3xl">✋</span>
+                )}
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Confirm Send</h3>
+              <h3 className="text-xl font-bold text-gray-900">
+                {sending ? "Sending..." : "Confirm Send"}
+              </h3>
               <p className="text-gray-500 text-sm mt-1">
-                Carefully check your message before sending
+                {sending
+                  ? "Please wait, this may take a moment..."
+                  : "Carefully check your message before sending"}
               </p>
             </div>
 
@@ -930,21 +1154,42 @@ export default function ManualOutreach() {
               </p>
               <p className="text-xs text-gray-500 mt-2 mb-1">Message:</p>
               <p className="text-sm text-gray-700 bg-white p-2 rounded-lg border border-gray-200">
-                {message}
+                {message || "📷 Photo message only"}
               </p>
+              {selectedPhotos.length > 0 && (
+                <>
+                  <p className="text-xs text-gray-500 mt-2 mb-1">Photos:</p>
+                  <div className="flex gap-2">
+                    {selectedPhotos.map((photo) => (
+                      <img
+                        key={photo.id}
+                        src={photo.image_url}
+                        className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                        alt=""
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              {sendEmail && (
+                <p className="text-xs text-blue-500 mt-2">
+                  📧 Email notification will be sent
+                </p>
+              )}
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                disabled={sending}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmSend}
                 disabled={sending}
-                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {sending ? (
                   <>
