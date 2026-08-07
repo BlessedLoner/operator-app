@@ -404,7 +404,7 @@ export default function ManualOutreach() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary shadow-sm sticky top-0 z-20">
+      <div className="bg-blue-500 shadow-sm sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
@@ -420,10 +420,10 @@ export default function ManualOutreach() {
                 {operator?.username}
               </span>
               <button
-                onClick={() => navigate("/dashboard")}
-                className="px-4 py-2 text-sm bg-white/20 text-white rounded-lg hover:bg-white/30 transition"
+                onClick={() => navigate("/login")}
+                className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
-                Dashboard
+                Logout
               </button>
             </div>
           </div>
@@ -460,7 +460,7 @@ export default function ManualOutreach() {
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder="Search by Display Name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -581,7 +581,7 @@ export default function ManualOutreach() {
                     setSelectedFictional(null);
                     setSelectedPhotos([]);
                   }}
-                  className="mt-3 text-xs text-gray-400 hover:text-red-500 transition"
+                  className="mt-3 bg-amber-700 text-xs text-white hover:text-red-500 transition"
                 >
                   Clear selection
                 </button>
@@ -940,7 +940,7 @@ export default function ManualOutreach() {
                   (message.trim() && message.length < 20) ||
                   sending
                 }
-                className="mt-4 w-full py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="mt-4 w-full py-3 bg-blue-500 text-white font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {sending ? (
                   <>
@@ -956,21 +956,21 @@ export default function ManualOutreach() {
               </button>
 
               {selectedUser && !selectedFictional && (
-                <p className="mt-2 text-xs text-amber-600 text-center">
+                <p className="mt-2 text-xs text-red-500 text-center">
                   Please select a fictional profile
                 </p>
               )}
               {selectedFictional &&
                 message.length > 0 &&
                 message.length < 20 && (
-                  <p className="mt-2 text-xs text-amber-600 text-center">
+                  <p className="mt-2 text-xs text-red-500 text-center">
                     Please add at least {20 - message.length} more characters
                   </p>
                 )}
               {selectedFictional &&
                 !message.trim() &&
                 selectedPhotos.length === 0 && (
-                  <p className="mt-2 text-xs text-amber-600 text-center">
+                  <p className="mt-2 text-xs text-red-500 text-center">
                     Please write a message or select a photo
                   </p>
                 )}
@@ -1189,7 +1189,7 @@ export default function ManualOutreach() {
               <button
                 onClick={confirmSend}
                 disabled={sending}
-                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {sending ? (
                   <>
