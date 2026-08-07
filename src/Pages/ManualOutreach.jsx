@@ -25,7 +25,7 @@ export default function ManualOutreach() {
 
   // ✅ Private photos states
   const [privatePhotos, setPrivatePhotos] = useState([]);
-  const [selectedPhotos, setSelectedPhotos] = useState([]);
+  const [selectedPhoto, setSelectedPhoto] = useState(null); // ✅ Only one photo
   const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
 
@@ -76,7 +76,7 @@ export default function ManualOutreach() {
       fetchPrivatePhotos(selectedFictional.id);
     } else {
       setPrivatePhotos([]);
-      setSelectedPhotos([]);
+      setSelectedPhoto(null);
       setShowPhotoPicker(false);
     }
   }, [selectedFictional]);
@@ -94,11 +94,30 @@ export default function ManualOutreach() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // ✅ Handle logout
+  const handleLogout = async () => {
+    try {
+      // Clear local storage
+      localStorage.removeItem("operator");
+      localStorage.removeItem("operator_device_id");
+
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+
+      // Navigate to login
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+      // Force navigate even if supabase signout fails
+      navigate("/login");
+    }
+  };
+
   // ✅ Fetch private photos for fictional profile
   const fetchPrivatePhotos = async (fictionalId) => {
     if (!fictionalId) {
       setPrivatePhotos([]);
-      setSelectedPhotos([]);
+      setSelectedPhoto(null);
       return;
     }
 
@@ -112,7 +131,7 @@ export default function ManualOutreach() {
 
       if (error) throw error;
       setPrivatePhotos(data || []);
-      setSelectedPhotos([]); // Reset selected photos when profile changes
+      setSelectedPhoto(null); // ✅ Reset selected photo when profile changes
       setShowPhotoPicker(false);
     } catch (err) {
       console.error("Error fetching private photos:", err);
@@ -121,15 +140,15 @@ export default function ManualOutreach() {
     }
   };
 
-  // ✅ Select/deselect photo
+  // ✅ Select/deselect photo (only one at a time)
   const handleSelectPhoto = (photo) => {
-    setSelectedPhotos((prev) => {
-      if (prev.some((p) => p.id === photo.id)) {
-        return prev.filter((p) => p.id !== photo.id);
-      } else {
-        return [...prev, photo];
-      }
-    });
+    if (selectedPhoto?.id === photo.id) {
+      // Deselect
+      setSelectedPhoto(null);
+    } else {
+      // Select this photo (replaces any previous selection)
+      setSelectedPhoto(photo);
+    }
   };
 
   // Search users
@@ -174,7 +193,7 @@ export default function ManualOutreach() {
     setSearchQuery("");
     setSelectedFictional(null);
     setMessage("");
-    setSelectedPhotos([]);
+    setSelectedPhoto(null);
     setShowHistory(false);
 
     // Fetch suggested fictional profiles
@@ -240,7 +259,7 @@ export default function ManualOutreach() {
     setSelectedFictional(profile);
     setFictionalSearchResults([]);
     setFictionalSearchQuery("");
-    setSelectedPhotos([]); // Reset selected photos when switching profiles
+    setSelectedPhoto(null); // ✅ Reset selected photo when switching profiles
     setShowPhotoPicker(false);
   };
 
@@ -278,7 +297,7 @@ export default function ManualOutreach() {
       return;
     }
 
-    if (!message.trim() && selectedPhotos.length === 0) {
+    if (!message.trim() && !selectedPhoto) {
       showToast("Please write a message or select a photo", "error");
       return;
     }
@@ -293,7 +312,6 @@ export default function ManualOutreach() {
 
   const confirmSend = async () => {
     setSending(true);
-    // Keep modal open - we'll show loading state inside it
 
     try {
       // First, send the flirt message
@@ -334,8 +352,8 @@ export default function ManualOutreach() {
         setRemainingDaily(data.remaining_daily || 0);
       }
 
-      // ✅ Send selected photos AFTER the message (with the correct conversation ID)
-      for (const photo of selectedPhotos) {
+      // ✅ Send selected photo AFTER the message (only one photo)
+      if (selectedPhoto) {
         const photoRes = await fetch(
           "https://operator-api-production-de23.up.railway.app/operator/send-photo",
           {
@@ -345,7 +363,7 @@ export default function ManualOutreach() {
               "x-operator-id": operator.id,
             },
             body: JSON.stringify({
-              photo_id: photo.id,
+              photo_id: selectedPhoto.id,
               conversation_id: conversationId,
               fictional_profile_id: selectedFictional.id,
               operator_id: operator.id,
@@ -354,7 +372,7 @@ export default function ManualOutreach() {
         );
 
         if (!photoRes.ok) {
-          console.error("Failed to send photo:", photo.id);
+          console.error("Failed to send photo:", selectedPhoto.id);
         }
       }
 
@@ -365,7 +383,7 @@ export default function ManualOutreach() {
       // Reset form
       setMessage("");
       setSendEmail(false);
-      setSelectedPhotos([]);
+      setSelectedPhoto(null);
 
       // Refresh history
       fetchOutreachHistory(operator.id);
@@ -420,7 +438,7 @@ export default function ManualOutreach() {
                 {operator?.username}
               </span>
               <button
-                onClick={() => navigate("/login")}
+                onClick={handleLogout}
                 className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
                 Logout
@@ -579,9 +597,9 @@ export default function ManualOutreach() {
                     setSelectedUser(null);
                     setSuggestedProfiles([]);
                     setSelectedFictional(null);
-                    setSelectedPhotos([]);
+                    setSelectedPhoto(null);
                   }}
-                  className="mt-3 bg-amber-700 text-xs text-white hover:text-red-500 transition"
+                  className="mt-3 text-xs text-gray-400 hover:text-red-500 transition"
                 >
                   Clear selection
                 </button>
@@ -767,7 +785,7 @@ export default function ManualOutreach() {
               </div>
             )}
 
-            {/* ✅ Private Photos Section */}
+            {/* ✅ Private Photos Section - Single selection only */}
             {selectedFictional && privatePhotos.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <button
@@ -824,7 +842,7 @@ export default function ManualOutreach() {
                             key={photo.id}
                             onClick={() => handleSelectPhoto(photo)}
                             className={`relative rounded-lg overflow-hidden aspect-square transition-all ${
-                              selectedPhotos.some((p) => p.id === photo.id)
+                              selectedPhoto?.id === photo.id
                                 ? "ring-4 ring-primary ring-offset-2"
                                 : "hover:ring-2 hover:ring-primary/30"
                             }`}
@@ -834,7 +852,7 @@ export default function ManualOutreach() {
                               alt=""
                               className="w-full h-full object-cover"
                             />
-                            {selectedPhotos.some((p) => p.id === photo.id) && (
+                            {selectedPhoto?.id === photo.id && (
                               <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
                                 <svg
                                   className="w-3 h-3 text-white"
@@ -860,29 +878,26 @@ export default function ManualOutreach() {
               </div>
             )}
 
-            {/* ✅ Selected Photo Preview */}
-            {selectedPhotos.length > 0 && (
+            {/* ✅ Selected Photo Preview - Single */}
+            {selectedPhoto && (
               <div className="bg-white rounded-2xl shadow-lg p-4 border border-primary/20">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-primary">
-                    Photos to send:
+                    Photo to send:
                   </span>
                   <button
-                    onClick={() => setSelectedPhotos([])}
+                    onClick={() => setSelectedPhoto(null)}
                     className="text-xs text-gray-400 hover:text-red-500 transition"
                   >
-                    Remove all
+                    Remove
                   </button>
                 </div>
                 <div className="flex gap-2">
-                  {selectedPhotos.map((photo) => (
-                    <img
-                      key={photo.id}
-                      src={photo.image_url}
-                      className="w-16 h-16 rounded-lg object-cover border border-gray-200"
-                      alt=""
-                    />
-                  ))}
+                  <img
+                    src={selectedPhoto.image_url}
+                    className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                    alt=""
+                  />
                 </div>
               </div>
             )}
@@ -936,7 +951,7 @@ export default function ManualOutreach() {
                 disabled={
                   !selectedUser ||
                   !selectedFictional ||
-                  (!message.trim() && selectedPhotos.length === 0) ||
+                  (!message.trim() && !selectedPhoto) ||
                   (message.trim() && message.length < 20) ||
                   sending
                 }
@@ -967,13 +982,11 @@ export default function ManualOutreach() {
                     Please add at least {20 - message.length} more characters
                   </p>
                 )}
-              {selectedFictional &&
-                !message.trim() &&
-                selectedPhotos.length === 0 && (
-                  <p className="mt-2 text-xs text-red-500 text-center">
-                    Please write a message or select a photo
-                  </p>
-                )}
+              {selectedFictional && !message.trim() && !selectedPhoto && (
+                <p className="mt-2 text-xs text-red-500 text-center">
+                  Please write a message or select a photo
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1119,7 +1132,7 @@ export default function ManualOutreach() {
         </div>
       </div>
 
-      {/* ✅ Updated Confirmation Modal with Loading State */}
+      {/* ✅ Confirmation Modal with Loading State */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
@@ -1156,18 +1169,15 @@ export default function ManualOutreach() {
               <p className="text-sm text-gray-700 bg-white p-2 rounded-lg border border-gray-200">
                 {message || "📷 Photo message only"}
               </p>
-              {selectedPhotos.length > 0 && (
+              {selectedPhoto && (
                 <>
-                  <p className="text-xs text-gray-500 mt-2 mb-1">Photos:</p>
+                  <p className="text-xs text-gray-500 mt-2 mb-1">Photo:</p>
                   <div className="flex gap-2">
-                    {selectedPhotos.map((photo) => (
-                      <img
-                        key={photo.id}
-                        src={photo.image_url}
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                        alt=""
-                      />
-                    ))}
+                    <img
+                      src={selectedPhoto.image_url}
+                      className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                      alt=""
+                    />
                   </div>
                 </>
               )}
