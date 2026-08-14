@@ -89,13 +89,18 @@ export default function ChatInterface() {
     fetchUserLogbook();
     fetchFictionalLogbook();
 
+    console.log("💬 Chat data received:", chatData);
+    console.log("👤 User profile:", chatData.userProfile);
+    console.log("💳 User credits:", chatData.userCredits);
+
     if (chatData.userCredits) {
       setUserCredits(chatData.userCredits);
-      setCreditsLoading(false);
-    } else if (user?.id) {
-      // Fetch credits if not provided
-      fetchUserCredits(user.id);
+    } else {
+      console.warn("⚠️ Backend did not provide userCredits");
+      setUserCredits(null);
     }
+
+    setCreditsLoading(false);
 
     const expiresAt = new Date(chatData.expiresAt);
 
@@ -128,6 +133,57 @@ export default function ChatInterface() {
       clearInterval(timeInterval);
     };
   }, [chatData]);
+
+  // useEffect(() => {
+  //   if (!chatData) {
+  //     navigate("/dashboard");
+  //     return;
+  //   }
+
+  //   fetchMessages();
+  //   fetchPrivatePhotos();
+  //   fetchUserLogbook();
+  //   fetchFictionalLogbook();
+
+  //   if (chatData.userCredits) {
+  //     setUserCredits(chatData.userCredits);
+  //     setCreditsLoading(false);
+  //   } else if (user?.id) {
+  //     // Fetch credits if not provided
+  //     fetchUserCredits(user.id);
+  //   }
+
+  //   const expiresAt = new Date(chatData.expiresAt);
+
+  //   const updateRemainingTime = () => {
+  //     const now = new Date();
+
+  //     const remaining = Math.max(0, Math.floor((expiresAt - now) / 1000));
+
+  //     setRemainingTime(remaining);
+
+  //     if (remaining <= 0) {
+  //       clearInterval(timerRef.current);
+
+  //       alert("Message timeout. Returning to dashboard...");
+
+  //       navigate("/dashboard");
+  //     }
+  //   };
+
+  //   updateRemainingTime();
+
+  //   timerRef.current = setInterval(updateRemainingTime, 1000);
+
+  //   updateUserLocalTime();
+
+  //   const timeInterval = setInterval(updateUserLocalTime, 1000);
+
+  //   return () => {
+  //     clearInterval(timerRef.current);
+  //     clearInterval(timeInterval);
+  //   };
+  // }, [chatData]);
 
   useEffect(() => {
     if (!chatData?.conversationId) return;
@@ -180,21 +236,46 @@ export default function ChatInterface() {
 
   // ✅ NEW: Fetch user credits directly
   const fetchUserCredits = async (userId) => {
-    if (!userId) return;
+    if (!userId) {
+      console.log("❌ fetchUserCredits: no userId");
+      setCreditsLoading(false);
+      return;
+    }
+
+    console.log("🔍 Fetching credits for user_profiles.id:", userId);
 
     setCreditsLoading(true);
+
     try {
       const { data, error } = await supabase
         .from("credits")
-        .select("balance, total_purchased, total_used, updated_at")
+        .select("user_id, balance, total_purchased, total_used, updated_at")
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (!error && data) {
-        setUserCredits(data);
+      console.log("💳 CREDIT QUERY RESULT:", {
+        userId,
+        data,
+        error,
+      });
+
+      if (error) {
+        console.error("❌ Credits query error:", error);
+        setUserCredits(null);
+        return;
       }
+
+      if (!data) {
+        console.warn("⚠️ No credits row found for:", userId);
+        setUserCredits(null);
+        return;
+      }
+
+      console.log("✅ Credits found:", data);
+      setUserCredits(data);
     } catch (err) {
-      console.error("Error fetching credits:", err);
+      console.error("❌ Error fetching credits:", err);
+      setUserCredits(null);
     } finally {
       setCreditsLoading(false);
     }
