@@ -105,6 +105,7 @@ export default function WaitingRoom() {
             fictionalProfile: data.fictionalProfile,
             expiresAt: data.expiresAt,
             type: operator?.operator_type,
+            userCredits: data.userCredits, // ✅ NEW: Pass credits
           },
         });
         return;
