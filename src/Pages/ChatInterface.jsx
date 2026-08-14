@@ -24,6 +24,10 @@ export default function ChatInterface() {
   const [noteValue, setNoteValue] = useState("");
   const [activeImage, setActiveImage] = useState(null);
 
+  // ✅ NEW: User credits state
+  const [userCredits, setUserCredits] = useState(null);
+  const [creditsLoading, setCreditsLoading] = useState(true);
+
   const [selectedPhotos, setSelectedPhotos] = useState([]); // Array of selected photo objects
   const [noteType, setNoteType] = useState("user"); // 'user' or 'fictional'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -63,6 +67,14 @@ export default function ChatInterface() {
     fetchPrivatePhotos();
     fetchUserLogbook();
     fetchFictionalLogbook();
+
+    if (chatData.userCredits) {
+      setUserCredits(chatData.userCredits);
+      setCreditsLoading(false);
+    } else if (user?.id) {
+      // Fetch credits if not provided
+      fetchUserCredits(user.id);
+    }
 
     const expiresAt = new Date(chatData.expiresAt);
 
@@ -142,6 +154,28 @@ export default function ChatInterface() {
       console.error("Failed to fetch messages:", err);
     } finally {
       setLoadingMessages(false);
+    }
+  };
+
+  // ✅ NEW: Fetch user credits directly
+  const fetchUserCredits = async (userId) => {
+    if (!userId) return;
+
+    setCreditsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("credits")
+        .select("balance, total_purchased, total_used, updated_at")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!error && data) {
+        setUserCredits(data);
+      }
+    } catch (err) {
+      console.error("Error fetching credits:", err);
+    } finally {
+      setCreditsLoading(false);
     }
   };
 
@@ -1459,6 +1493,12 @@ export default function ChatInterface() {
                     )}
                   </div>
                   <div className="space-y-2">
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="text-xs text-gray-500">Credits:</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {userCredits?.balance || "0"}
+                      </span>
+                    </div>
                     <div className="flex justify-between py-1 border-b border-gray-100">
                       <span className="text-xs text-gray-500">Gender:</span>
                       <span className="text-xs font-medium text-gray-700">
