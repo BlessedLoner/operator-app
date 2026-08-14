@@ -57,6 +57,27 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
+  const user = chatData?.userProfile;
+  const fictional = chatData?.fictionalProfile;
+
+  const countryColors = () => {
+    const country = user?.country;
+    switch (country) {
+      case "GB":
+        return "from-blue-600 to-blue-700";
+      case "US":
+        return "from-red-700 to-blue-700";
+      case "CA":
+        return "from-red-600 to-red-700";
+      case "AU":
+        return "from-blue-600 to-red-600";
+      case "ZA":
+        return "from-green-700 to-yellow-700";
+      default:
+        return "from-gray-700 to-gray-800";
+    }
+  };
+
   useEffect(() => {
     if (!chatData) {
       navigate("/dashboard");
@@ -491,27 +512,6 @@ export default function ChatInterface() {
 
     localStorage.removeItem("operator");
     navigate("/");
-  };
-
-  const user = chatData?.userProfile;
-  const fictional = chatData?.fictionalProfile;
-
-  const countryColors = () => {
-    const country = user?.country;
-    switch (country) {
-      case "GB":
-        return "from-blue-600 to-blue-700";
-      case "US":
-        return "from-red-700 to-blue-700";
-      case "CA":
-        return "from-red-600 to-red-700";
-      case "AU":
-        return "from-blue-600 to-red-600";
-      case "ZA":
-        return "from-green-700 to-yellow-700";
-      default:
-        return "from-gray-700 to-gray-800";
-    }
   };
 
   // Categories for logbook
@@ -1495,8 +1495,14 @@ export default function ChatInterface() {
                   <div className="space-y-2">
                     <div className="flex justify-between py-1 border-b border-gray-100">
                       <span className="text-xs text-gray-500">Credits:</span>
-                      <span className="text-xs font-medium text-gray-700">
-                        {userCredits?.balance || "0"}
+                      <span
+                        className={`text-xs font-medium ${userCredits?.balance < 5 && userCredits?.balance > 0 ? "text-orange-500" : "text-gray-700"}`}
+                      >
+                        {creditsLoading ? (
+                          <span className="inline-block w-8 h-3 bg-gray-200 animate-pulse rounded"></span>
+                        ) : (
+                          (userCredits?.balance ?? 0)
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-100">
