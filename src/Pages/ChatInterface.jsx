@@ -409,6 +409,20 @@ export default function ChatInterface() {
         if (!textRes.ok) {
           const errorData = await textRes.json();
 
+          // ✅ ADD THIS: Handle blocked message
+          if (textRes.status === 403 && errorData.logout) {
+            alert(
+              errorData.error ||
+                "Your account has been flagged for attempting to share contact information.",
+            );
+
+            // Clear local storage and redirect to login
+            localStorage.removeItem("operator");
+            localStorage.removeItem("operator_device_id");
+            navigate("/login");
+            return;
+          }
+
           // Duplicate device protection
           if (textRes.status === 409) {
             alert(
@@ -702,25 +716,24 @@ export default function ChatInterface() {
     return text.substring(0, maxLength) + "...";
   };
 
-  function maskSensitiveInfo(text) {
-    if (!text) return text;
-
-    let masked = text;
-
-    // Mask emails
-    masked = masked.replace(
-      /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
-      (email) => {
-        const domain = email.split("@")[1];
-        return `***********@${domain}`;
-      },
-    );
-
-    // Mask phone numbers
-    masked = masked.replace(/(\+?\d[\d\s\-]{6,}\d)/g, "***********");
-
-    return masked;
-  }
+  // In ChatInterface.jsx - Add this helper function near the top
+  const renderMessageContent = (msg) => {
+    // If message was masked, show with lock icon
+    if (msg.was_masked) {
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm">{msg.content}</span>
+          <span
+            className="text-xs text-gray-400"
+            title="This message was masked for privacy"
+          >
+            🔒
+          </span>
+        </div>
+      );
+    }
+    return <span className="text-sm">{msg.content}</span>;
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
@@ -1264,10 +1277,10 @@ export default function ChatInterface() {
                                 />
                               )}
                               {/* Text below image */}
-                              {maskSensitiveInfo(msg.content) && (
+                              {renderMessageContent(msg) && (
                                 <div className="px-4 py-2">
                                   <p className="text-sm break-words">
-                                    {maskSensitiveInfo(msg.content)}
+                                    {renderMessageContent(msg)}
                                   </p>
                                   <p
                                     className={`text-xs mt-1 ${isUser ? "text-black" : "text-gray-500"}`}
