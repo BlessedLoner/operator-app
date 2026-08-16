@@ -4,6 +4,7 @@ import ReactCountryFlag from "react-country-flag";
 import DefaultAvatar from "../assets/default-avatar-male.svg";
 import { useInactivityLogout } from "../hooks/useInactivityLogout";
 import { supabase } from "../lib/supabaseClient";
+import { detectSensitiveInfo } from "../../../operator-api/src/utils/sensitiveInfoDetector";
 
 export default function ChatInterface() {
   const [reply, setReply] = useState("");
@@ -23,6 +24,10 @@ export default function ChatInterface() {
   const [noteCategory, setNoteCategory] = useState("");
   const [noteValue, setNoteValue] = useState("");
   const [activeImage, setActiveImage] = useState(null);
+
+  // Inside your component, add state:
+  const [showPrivacyWarning, setShowPrivacyWarning] = useState(false);
+  const [warningType, setWarningType] = useState(null);
 
   // ✅ NEW: User credits state
   const [userCredits, setUserCredits] = useState(null);
@@ -284,6 +289,23 @@ export default function ChatInterface() {
       setUserCredits(null);
     } finally {
       setCreditsLoading(false);
+    }
+  };
+
+  // Function to check message as user types
+  const handleMessageChange = (text) => {
+    if (text && text.length > 5) {
+      const result = detectSensitiveInfo(text);
+      if (result.detected) {
+        setShowPrivacyWarning(true);
+        setWarningType(result.type);
+      } else {
+        setShowPrivacyWarning(false);
+        setWarningType(null);
+      }
+    } else {
+      setShowPrivacyWarning(false);
+      setWarningType(null);
     }
   };
 
@@ -1253,6 +1275,8 @@ export default function ChatInterface() {
                     </div>
                   ) : (
                     <>
+                      // Update your message render section to include the
+                      warning:
                       {messages.map((msg) => {
                         const isUser = msg.sender_type === "real_user";
                         return (
@@ -1282,8 +1306,15 @@ export default function ChatInterface() {
                                   <p className="text-sm break-words">
                                     {renderMessageContent(msg)}
                                   </p>
+                                  {msg.was_masked && isUser && (
+                                    <span className="text-xs text-yellow-200 mt-1 block">
+                                      🔒 Message masked for privacy
+                                    </span>
+                                  )}
                                   <p
-                                    className={`text-xs mt-1 ${isUser ? "text-black" : "text-gray-500"}`}
+                                    className={`text-xs mt-1 ${
+                                      isUser ? "text-white/70" : "text-gray-500"
+                                    }`}
                                   >
                                     {formatMessageTime(msg.created_at)}
                                   </p>
@@ -1293,7 +1324,9 @@ export default function ChatInterface() {
                               {msg.image_url && !msg.content && (
                                 <div className="px-4 py-1">
                                   <p
-                                    className={`text-xs ${isUser ? "text-white/70" : "text-gray-500"}`}
+                                    className={`text-xs ${
+                                      isUser ? "text-white/70" : "text-gray-500"
+                                    }`}
                                   >
                                     {formatMessageTime(msg.created_at)}
                                   </p>
@@ -1303,7 +1336,6 @@ export default function ChatInterface() {
                           </div>
                         );
                       })}
-
                       <div ref={messagesEndRef} />
                     </>
                   )}
@@ -1359,6 +1391,25 @@ export default function ChatInterface() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {/* Add this before the input area */}
+                {showPrivacyWarning && (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3 rounded">
+                    <p className="text-sm text-yellow-700 flex items-center gap-2">
+                      <span>⚠️</span>
+                      <span>
+                        Please avoid sharing personal contact information like
+                        phone numbers or emails.
+                        {warningType === "phone" &&
+                          " Phone numbers will be automatically masked."}
+                        {warningType === "email" &&
+                          " Email addresses will be automatically masked."}
+                        {warningType === "social" &&
+                          " Social media handles will be automatically masked."}
+                      </span>
+                    </p>
                   </div>
                 )}
 
