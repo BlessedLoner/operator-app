@@ -4,7 +4,7 @@ import ReactCountryFlag from "react-country-flag";
 import DefaultAvatar from "../assets/default-avatar-male.svg";
 import { useInactivityLogout } from "../hooks/useInactivityLogout";
 import { supabase } from "../lib/supabaseClient";
-import { detectSensitiveInfo } from "../../../operator-api/src/utils/sensitiveInfoDetector";
+import { detectSensitiveInfo } from "../utils/sensitiveInfoDetector";
 
 export default function ChatInterface() {
   const [reply, setReply] = useState("");
