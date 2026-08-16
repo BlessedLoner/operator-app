@@ -94,13 +94,19 @@ export default function ChatInterface() {
     console.log("💳 User credits:", chatData.userCredits);
 
     if (chatData.userCredits) {
+      console.log("✅ Credits received from backend:", chatData.userCredits);
       setUserCredits(chatData.userCredits);
+      setCreditsLoading(false);
+    } else if (chatData.userProfile?.id) {
+      console.warn(
+        "⚠️ Backend did not provide userCredits. Fetching directly...",
+      );
+      fetchUserCredits(chatData.userProfile.id);
     } else {
-      console.warn("⚠️ Backend did not provide userCredits");
+      console.warn("⚠️ No user profile ID available for credits");
       setUserCredits(null);
+      setCreditsLoading(false);
     }
-
-    setCreditsLoading(false);
 
     const expiresAt = new Date(chatData.expiresAt);
 
