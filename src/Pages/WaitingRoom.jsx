@@ -159,6 +159,7 @@ export default function WaitingRoom() {
             fictionalProfile: assignData.fictionalProfile,
             expiresAt: assignData.expiresAt,
             type: operator?.operator_type,
+            userCredits: assignData.userCredits,
           },
         });
       }
