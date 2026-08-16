@@ -1275,8 +1275,6 @@ export default function ChatInterface() {
                     </div>
                   ) : (
                     <>
-                      // Update your message render section to include the
-                      warning:
                       {messages.map((msg) => {
                         const isUser = msg.sender_type === "real_user";
                         return (
