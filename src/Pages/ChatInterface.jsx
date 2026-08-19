@@ -215,10 +215,33 @@ export default function ChatInterface() {
           // Only add messages from users (not the operator's own replies)
           if (newMessage.sender_type === "real_user") {
             console.log("📨 New message received:", newMessage);
+
+            // 🔒 Protect sensitive information for OPERATOR VIEW only
+            let protectedMessage = newMessage;
+
+            if (newMessage.content && typeof newMessage.content === "string") {
+              const result = detectSensitiveInfo(newMessage.content);
+
+              if (result.detected) {
+                protectedMessage = {
+                  ...newMessage,
+                  content: result.masked,
+                  was_masked: true,
+                  detection_type: result.type,
+                };
+
+                console.log(`🔒 Realtime ${result.type} masked for operator`);
+              }
+            }
+
             setMessages((prev) => {
-              if (prev.some((m) => m.id === newMessage.id)) return prev;
-              return [...prev, newMessage];
+              if (prev.some((m) => m.id === protectedMessage.id)) {
+                return prev;
+              }
+
+              return [...prev, protectedMessage];
             });
+
             scrollToBottom();
           }
         },
