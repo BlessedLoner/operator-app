@@ -283,7 +283,7 @@ export default function ChatInterface() {
     try {
       const { data, error } = await supabase
         .from("credits")
-        .select("user_id, balance, total_purchased, total_used, updated_at")
+        .select("*")
         .eq("user_id", userId)
         .maybeSingle();
 
