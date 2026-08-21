@@ -83,62 +83,6 @@ export default function ChatInterface() {
     }
   };
 
-  // ✅ NEW: Fetch user credits directly
-  const fetchUserCredits = async (userId) => {
-    if (!userId) {
-      console.log("❌ fetchUserCredits: no userId");
-      setCreditsLoading(false);
-      return;
-    }
-
-    console.log("🔍 Fetching credits for user_profiles.id:", userId);
-
-    setCreditsLoading(true);
-
-    try {
-      // Step 1: get user profile ID
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      const { data, error } = await supabase
-        .from("credits")
-        .select("*")
-        .eq("user_id", profile.id)
-        .maybeSingle();
-
-      console.log("💳 CREDIT QUERY RESULT:", {
-        userId: profile.id,
-        data,
-        error,
-      });
-
-      if (error) {
-        console.error("❌ Credits query error:", error);
-        setUserCredits(null);
-        return;
-      }
-
-      if (!data) {
-        console.warn("⚠️ No credits row found for:", profile.id);
-        setUserCredits(null);
-        return;
-      }
-
-      console.log("✅ Credits found:", data);
-      setUserCredits(data);
-    } catch (err) {
-      console.error("❌ Error fetching credits:", err);
-      setUserCredits(null);
-    } finally {
-      setCreditsLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (!chatData) {
       navigate("/dashboard");
@@ -152,16 +96,9 @@ export default function ChatInterface() {
 
     console.log("💬 Chat data received:", chatData);
     console.log("👤 User profile:", chatData.userProfile);
-    console.log("💳 User credits:", chatData.userCredits);
+    console.log("💳 Backend user credits:", chatData.userCredits);
 
-    if (chatData.userCredits) {
-      console.log("✅ Credits received from backend:", chatData.userCredits);
-      setUserCredits(chatData.userCredits);
-      setCreditsLoading(false);
-    } else if (chatData.userProfile?.id) {
-      console.warn(
-        "⚠️ Backend did not provide userCredits. Fetching directly...",
-      );
+    if (chatData.userProfile?.id) {
       fetchUserCredits(chatData.userProfile.id);
     } else {
       console.warn("⚠️ No user profile ID available for credits");
@@ -324,6 +261,57 @@ export default function ChatInterface() {
     }
   };
 
+  // Fetch user credits directly from Supabase
+  const fetchUserCredits = async (userProfileId) => {
+    if (!userProfileId) {
+      console.log("❌ fetchUserCredits: no user profile ID");
+      setUserCredits(null);
+      setCreditsLoading(false);
+      return;
+    }
+
+    console.log("🔍 Fetching credits for user_profiles.id:", userProfileId);
+
+    setCreditsLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from("credits")
+        .select("balance")
+        .eq("user_id", userProfileId)
+        .maybeSingle();
+
+      console.log("💳 CREDIT QUERY RESULT:", {
+        userProfileId,
+        data,
+        error,
+      });
+
+      if (error) {
+        console.error("❌ Credits query error:", error);
+        setUserCredits(null);
+        return;
+      }
+
+      if (!data) {
+        console.warn(
+          "⚠️ No credits row found for user profile:",
+          userProfileId,
+        );
+        setUserCredits(null);
+        return;
+      }
+
+      console.log("✅ Credits found:", data);
+
+      setUserCredits(data);
+    } catch (err) {
+      console.error("❌ Error fetching credits:", err);
+      setUserCredits(null);
+    } finally {
+      setCreditsLoading(false);
+    }
+  };
   // Function to check message as user types
   const handleMessageChange = (text) => {
     if (text && text.length > 5) {
