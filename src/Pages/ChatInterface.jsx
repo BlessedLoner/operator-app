@@ -83,6 +83,62 @@ export default function ChatInterface() {
     }
   };
 
+  // ✅ NEW: Fetch user credits directly
+  const fetchUserCredits = async (userId) => {
+    if (!userId) {
+      console.log("❌ fetchUserCredits: no userId");
+      setCreditsLoading(false);
+      return;
+    }
+
+    console.log("🔍 Fetching credits for user_profiles.id:", userId);
+
+    setCreditsLoading(true);
+
+    try {
+      // Step 1: get user profile ID
+      const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const { data, error } = await supabase
+        .from("credits")
+        .select("*")
+        .eq("user_id", profile.id)
+        .maybeSingle();
+
+      console.log("💳 CREDIT QUERY RESULT:", {
+        userId: profile.id,
+        data,
+        error,
+      });
+
+      if (error) {
+        console.error("❌ Credits query error:", error);
+        setUserCredits(null);
+        return;
+      }
+
+      if (!data) {
+        console.warn("⚠️ No credits row found for:", profile.id);
+        setUserCredits(null);
+        return;
+      }
+
+      console.log("✅ Credits found:", data);
+      setUserCredits(data);
+    } catch (err) {
+      console.error("❌ Error fetching credits:", err);
+      setUserCredits(null);
+    } finally {
+      setCreditsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!chatData) {
       navigate("/dashboard");
@@ -265,53 +321,6 @@ export default function ChatInterface() {
       console.error("Failed to fetch messages:", err);
     } finally {
       setLoadingMessages(false);
-    }
-  };
-
-  // ✅ NEW: Fetch user credits directly
-  const fetchUserCredits = async (userId) => {
-    if (!userId) {
-      console.log("❌ fetchUserCredits: no userId");
-      setCreditsLoading(false);
-      return;
-    }
-
-    console.log("🔍 Fetching credits for user_profiles.id:", userId);
-
-    setCreditsLoading(true);
-
-    try {
-      const { data, error } = await supabase
-        .from("credits")
-        .select("*")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      console.log("💳 CREDIT QUERY RESULT:", {
-        userId,
-        data,
-        error,
-      });
-
-      if (error) {
-        console.error("❌ Credits query error:", error);
-        setUserCredits(null);
-        return;
-      }
-
-      if (!data) {
-        console.warn("⚠️ No credits row found for:", userId);
-        setUserCredits(null);
-        return;
-      }
-
-      console.log("✅ Credits found:", data);
-      setUserCredits(data);
-    } catch (err) {
-      console.error("❌ Error fetching credits:", err);
-      setUserCredits(null);
-    } finally {
-      setCreditsLoading(false);
     }
   };
 
